@@ -6,118 +6,51 @@
 
 ## 1. Thesis
 
-When an autonomous AI agent or institutional operations desk evaluates an incoming deal, ad placement, counterparty, or smart contract transaction, relying on a single centralized LLM endpoint creates a catastrophic point of failure. Models hallucinate, providers experience localized outages, and prompt injection can blind an ungrounded system to existential downside risk.
+A consumer platform that has to decide whether a claim, link, or offer is trustworthy faces a practical problem: a single model can be wrong, stale, or unavailable. Paying for specialist intelligence can help, but only if the request, answer, cost, and limits are visible and testable.
 
-Tina solves this by decoupling evaluation authority from single-model bias. Operating over Telegraph Protocol—a decentralized marketplace for verifiable AI inference—Tina coordinates parallel, economically metered intelligence purchases across specialized miners. Each claim is corroborated across independent models, graded by cryptographic validator quorums, and finalized with immutable on-chain receipts and signal hashes.
-
----
-
-## 2. Architecture & Telegraph Integration
-
-```
-  User / Ingestion Pipeline (Ad, Deal, Smart Contract, Counterparty)
-                           │
-                           ▼
-                 ┌──────────────────┐
-                 │   Tina Engine    │
-                 │   Coordinator    │
-                 └─────────┬────────┘
-                           │
-         Parallel x402 / Escrow Inference Requests
-         ($0.01 per Signal, settled on Sepolia Port Contract)
-                           │
-          ┌────────────────┼────────────────┐
-          ▼                ▼                ▼
-   [CONTENT_MODERATION] [KEYWORD_EXTRACTION] [API_HEALTH_CHECK]
-    Miner: Cp Gemini     Miner: TxLens       Miner: DevNode
-          │                │                │
-          ▼                ▼                ▼
-      Signal Hash      Signal Hash      Signal Hash
-     (0x8078e2...)    (0x1fde17...)    (0x5cf8fd...)
-          │                │                │
-          └────────────────┼────────────────┘
-                           │
-                           ▼
-          ┌─────────────────────────────────┐
-          │  Cryptographic Audit Memo (JSON)│
-          │  - Policy Violation Severity    │
-          │  - Salient Technical Entities   │
-          │  - Verifiable Receipt Hashes    │
-          │  - Cumulative Micro-Fee Line    │
-          └─────────────────────────────────┘
-```
-
-### Verified Telegraph Rail Details
-- **Settlement Network:** Ethereum Sepolia (`eip155:11155111`)
-- **Telegraph Diamond (Port Contract):** `0x3624EB012B5E998BB57B6bE6C9Cfc9c4bc5eb99b`
-- **USDC Token:** `0xcc194e1a843B658526D0D5C431f670028582Ae17`
-- **Payment Scheme:** Native Escrow Authorization (`personal_sign` EIP-191 via `@telegraphprotocol/telegraph-protocol-mcp`)
-- **Observed Execution Cost:** `$0.01` per verified signal
+Tina is an early prototype exploring that workflow through Telegraph. The current code is deliberately in **dry-run mode**. It does not yet make paid requests, corroborate independent answers, or produce current receipts. Those capabilities are goals, not shipped behavior.
 
 ---
 
-## 3. Verified Signal Evidence
+## 2. Current implementation
 
-All signals produced by Tina are cryptographically verifiable on the live Telegraph Devnet:
+The repository contains a small Python CLI. By default it prints the supplied target and reports a dry-run status without making network requests or spending funds. `--execute` is intentionally disabled until a safe live flow is verified.
 
-| Intent | Miner ID | Signal Hash | Receipt Hash | Status |
-|---|---|---|---|---|
-| `CONTENT_MODERATION_GENERAL` | `190074` | `0x8078e2ba2464083356c6f2acee1533c6be9d9122fa7e423ca814882cbfbf890d` | `0x274627688fa6ae83f95fedeaff3bc61c9d54650315ec55406ac49ad5e0362da5` | `Verified` |
-| `KEYWORD_EXTRACTION_GENERAL` | `190074` | `0x1fde177fd525a3c4067322986399bc61c8e6c190a0c5b04d011acfc63dd76a67` | `0x24edc567c8a3a45bc63ec2eef096d0de735a44db280da7973bdaed9d87c2e682` | `Verified` |
-| `CRYPTO_PRICE_USD` | `190074` | `0x5cf8fd15111f6cec6831d92898ce76aad12be21902b7bd06645232c2e99f6255` | `0xa0d38c702879f098b7b90813c1490c4afe99c7eb889b5997718579653fc13100` | `Verified` |
-
-Verify any signal directly via cURL:
-```bash
-curl -s https://devnode.telegraphprotocol.com/engine/v1/signal/0x8078e2ba2464083356c6f2acee1533c6be9d9122fa7e423ca814882cbfbf890d
-```
+The live request helper is not enabled from the CLI. Any future implementation must use a fresh, unexposed test wallet, the exact live Intent schema, a verified price/quote, explicit spending ceilings, and auditable response evidence. No current per-signal price is claimed.
 
 ---
 
-## 4. Quickstart & Reproduction Guide
+## 3. Evidence status
 
-### Prerequisites
-- Node.js v20+ or Bun runtime
+The repository previously listed three signal/receipt pairs as live-verifiable. As of **November 17, 2026**, the public Devnode returns `signal not found` for the documented moderation signal. Those historical identifiers are therefore not presented here as currently verified evidence. The app has not yet demonstrated a reproducible, current Telegraph purchase with a result and verifiable accounting record from a fresh input.
+
+Track 2 is separate: the public evaluation API currently reports this contributor's existing rows as eligible (20 moderation, 6 keyword extraction, 6 grammar/spell-check). Pool snapshots and eligibility are not proof of prize payment or earnings.
+
+Before using a new signal as proof, verify it against the current public endpoint and record the returned request, result, network, actual price, and available receipt/accounting evidence. Do not infer settlement from an HTTP 200 or a payment challenge.
+
+---
+
+## 4. Run the safe prototype
+
+### Requirements
 - Python 3.10+
-- Dedicated testnet EVM private key
-
-### Installation
 
 ```bash
-# Clone the repository
 git clone https://github.com/atharhive/Tina.git
 cd Tina
-
-# Install runtime dependencies
-npm install
-
-# Copy environment template
-cp .env.example .env
+python3 core/engine.py --target "Suspicious sponsored offer promising guaranteed weekly returns"
 ```
 
-### Configure Environment (`.env`)
-```ini
-TELEGRAPH_NODE_URL=https://devnode.telegraphprotocol.com
-TELEGRAPH_ENGINE_URL=https://devnode.telegraphprotocol.com/engine
-TELEGRAPH_DAEMON_URL=https://devnode.telegraphprotocol.com/daemon
-TELEGRAPH_PAYMENT=escrow
-TELEGRAPH_PRIVATE_KEY=0x_your_sepolia_private_key_here
-```
-
-### Run Due-Diligence Verification
-```bash
-# Execute autonomous evaluation on a sample target
-python3 core/engine.py --target "Sponsored AI yield vault offering 14% weekly returns with zero drawdown"
-```
-
-### Inspect Output Memo
-The synthesized audit memo will be emitted to `reports/audit_memo.json`, containing policy classifications, risk severity, extracted technical keyphrases, and on-chain receipt hashes.
+Expected behavior: prints `DRY RUN: no requests sent and no funds spent.` No key, Node dependency, or network connection is needed for this path. `--execute` currently exits without making a request.
 
 ---
 
-## 5. Hackathon Submission Details (Season II)
+## 5. Project status
 
-- **Track:** Track 01 Apps & Agents (Commercial Missions: Consumer Platform & Web3 DeFi)
-- **Author:** Athar (@atharhive)
-- **Contributor Wallet:** `0xb2b73753BC5396f5EbB34b0ea099ABCCFc6F2147`
-- **Milestone 1:** Completed (Nov 14, 2026) with verified on-chain signal and receipt commitments.
-- **License:** MIT
+Tina is an unfinished prototype and is not currently a qualifying, independently reproducible paid Telegraph application. The original Consumer Platform mission issue is #195; it is currently claimed by another contributor, so this repository does not claim that mission. The team has not verified a fresh paid app flow or a prize award.
+
+The existing evaluation submissions are a separate Track 2 contribution. As of November 17, 2026, the public API reports 20 eligible moderation rows, 6 eligible keyword-extraction rows, and 6 eligible grammar/spell-check rows for the contributor. This is not a payout confirmation.
+
+## License
+
+MIT. See [LICENSE](LICENSE). See also `.env.example` for configuration names; never commit real credentials.
