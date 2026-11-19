@@ -8,6 +8,7 @@ they can be unit-tested without the network.
 
 from __future__ import annotations
 
+import re
 import statistics
 from dataclasses import dataclass, field
 from typing import Any, Callable
@@ -316,6 +317,31 @@ def _evidence_penalty(missing: dict[str, int] | None, thin: bool, reasons: list[
     return risk
 
 
+ZONE_STOPWORDS = {"zone", "hub", "node", "the", "and", "of", "gen", "apnd", "da"}
+
+
+def zone_tokens(zone: str) -> set[str]:
+    """Words in a zone name that identify a market, ignoring filler."""
+    return {t for t in re.split(r"[^a-z0-9]+", zone.lower()) if t and t not in ZONE_STOPWORDS}
+
+
+def market_matches(zone: str, answer: "AskResult") -> bool:
+    """True when an answer's own labels mention the requested zone.
+
+    The network routes a zone question to miners that price different markets (a CAISO
+    zone got answered with a European day-ahead price in one run), so the zone label in
+    the answer is the only way to tell which answer belongs to the question.
+    """
+    tokens = zone_tokens(zone)
+    if not tokens:
+        return True
+    result = answer.result if isinstance(answer.result, dict) else {}
+    text = " ".join(
+        str(result.get(key) or "") for key in ("node_or_zone", "market", "zone", "region")
+    ).lower()
+    return any(token in text for token in tokens)
+
+
 def score_mining(
     hashprice_usd_per_ph_day: float | None,
     lmp_usd_per_mwh: float | None,
@@ -604,8 +630,47 @@ def mining_check(
         ),
         desk.observe("MINING_HASHPRICE_VERIFY_GENERAL", {"block_height": block}, on_event=on_event),
     ]
-    lmp = observations[0].field("lmp_usd_per_mwh")
+    grid = observations[0]
+    matched = [s for s in grid.answered if market_matches(zone, s)]
+    excluded = [s for s in grid.answered if s not in matched]
+    if matched and excluded:
+        # Keep the answers that are about this zone; the rest priced another market.
+        grid = Observation(
+            intent=grid.intent,
+            params=grid.params,
+            samples=matched + grid.missing,
+            cost_usd=grid.cost_usd,
+            error=grid.error,
+        )
+        observations[0] = grid
+
+    lmp = grid.field("lmp_usd_per_mwh")
     hashprice = observations[1].field("hashprice_usd_per_ph_day")
+    derived = None
+
+    # Two of three miners returned sats but no USD figure; convert rather than drop them,
+    # but say so, and only with a freshly bought BTC price.
+    sats = observations[1].field("hashprice_sats_per_ph_day")
+    usd_missing = hashprice.missing
+    if len(hashprice.values) < 2 and sats.median:
+        btc = desk.observe("CRYPTO_PRICE_USD", {"symbol": "BTC"}, miners=1, on_event=on_event)
+        price = btc.field("price_usd").median
+        observations.append(btc)
+        if price:
+            derived = {
+                "from": "hashprice_sats_per_ph_day",
+                "sats_per_ph_day": sats.median,
+                "btc_usd": price,
+                "hashprice_usd_per_ph_day": round(sats.median / 1e8 * price, 4),
+            }
+            hashprice = FieldRead(
+                name="hashprice_usd_per_ph_day",
+                values=[derived["hashprice_usd_per_ph_day"]],
+                median=derived["hashprice_usd_per_ph_day"],
+                agreement=sats.agreement,
+                missing=0,
+            )
+
     verdict = score_mining(
         hashprice_usd_per_ph_day=hashprice.median,
         lmp_usd_per_mwh=lmp.median,
@@ -615,6 +680,28 @@ def mining_check(
         missing={"lmp_usd_per_mwh": lmp.missing, "hashprice_usd_per_ph_day": hashprice.missing},
         thin=_thin(observations) or len(lmp.values) < 2 or len(hashprice.values) < 2,
     )
+    if excluded:
+        markets = sorted(
+            {
+                str((s.result or {}).get("market") or (s.result or {}).get("node_or_zone") or "unlabelled")
+                for s in excluded
+                if isinstance(s.result, dict)
+            }
+        )
+        verdict["reasons"].insert(
+            0,
+            f"excluded {len(excluded)} answer(s) that priced a different market than {zone}: "
+            + "; ".join(markets[:3]),
+        )
+
+    if derived:
+        verdict["reasons"].insert(
+            0,
+            f"hashprice in USD was missing from {usd_missing} of {len(observations[1].answered)} miners, so it is "
+            f"derived: {derived['sats_per_ph_day']:,.0f} sats/PH/day at ${derived['btc_usd']:,.2f} BTC "
+            f"= ${derived['hashprice_usd_per_ph_day']:,.2f}/PH/day",
+        )
+
     return {
         "workflow": "mining",
         "mission": "Mission 12 Mining & Power",
@@ -627,6 +714,7 @@ def mining_check(
         },
         "verdict": verdict,
         "observations": [o.as_dict() for o in observations],
+        "derived": derived,
         "cost_usd": round(sum(o.cost_usd for o in observations), 6),
         "gaps": [o.error for o in observations if o.error],
     }
