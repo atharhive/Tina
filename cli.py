@@ -22,7 +22,7 @@ import sys
 from pathlib import Path
 
 from core import __version__
-from core.client import PaymentRefused, TelegraphClient, TelegraphError
+from core.client import PaymentRefused, SpendLog, TelegraphClient, TelegraphError
 from core.catalogue import health, miners, plan, workflow_health
 from core.flows import Desk, listing_check, stablecoin_check, yield_check
 from core.report import write_run
@@ -125,6 +125,18 @@ def cmd_quote(args: argparse.Namespace) -> int:
             f"escrow={row['escrow_available']}"
         )
     print(f"\nprojected cost for this run: ${estimate['projected_usd']:.4f} USDC")
+    return 0
+
+
+def cmd_spend(args: argparse.Namespace) -> int:
+    """What the caps have actually been charged, per UTC day. Free."""
+    log = SpendLog()
+    rows = log.history()
+    if not rows:
+        print("nothing charged yet")
+    for day, amount in rows.items():
+        print(f"{day}  ${amount:.4f}")
+    print(f"today  ${log.today():.4f} of ${args.max_day:.2f} daily cap")
     return 0
 
 
@@ -242,6 +254,9 @@ def build_parser() -> argparse.ArgumentParser:
     q.add_argument("--issuer", default="Circle")
     q.add_argument("--project", default="aave-v3")
     q.set_defaults(func=cmd_quote)
+
+    sp = sub.add_parser("spend", parents=[common], help="what the caps have been charged, per day (free)")
+    sp.set_defaults(func=cmd_spend)
 
     mn = sub.add_parser("miners", parents=[common], help="ranked miners for an intent, with prices (free)")
     mn.add_argument("intent")

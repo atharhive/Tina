@@ -106,6 +106,10 @@ class SpendLog:
         key = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         return float(self._load().get(key, 0.0))
 
+    def history(self) -> dict[str, float]:
+        """Every day the log has seen, oldest first."""
+        return dict(sorted(self._load().items()))
+
     def add(self, usd: float) -> None:
         state = self._load()
         key = datetime.now(timezone.utc).strftime("%Y-%m-%d")
