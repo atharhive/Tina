@@ -1,6 +1,6 @@
 # Demo video
 
-`tina-demo.mp4` - 2:40, 1280x720, narrated by `en-US-ChristopherNeural` (the voice used in the Claude video pipeline), normalised to -15.6 LUFS with a -1.2 dBFS peak.
+`tina-demo.mp4` - 2:40, 1280x720, narrated by `en-US-ChristopherNeural` (the voice used in the Claude video pipeline), -15.7 LUFS integrated with a -0.9 dBFS peak, and a 0.9 second lead-in before the first word.
 
 **What it is, honestly:** a reconstruction, not a live screen capture. Every terminal
 line in it is copied from the committed runs in `../evidence/`; the frames were rendered
