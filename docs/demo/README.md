@@ -1,6 +1,6 @@
 # Demo video
 
-`tina-demo.mp4` - 3:31, 1280x720, narrated by a male British English voice, normalised to -15 LUFS with a -0.6 dBFS peak.
+`tina-demo.mp4` - 2:40, 1280x720, narrated by `en-US-ChristopherNeural` (the voice used in the Claude video pipeline), normalised to -15.6 LUFS with a -1.2 dBFS peak.
 
 **What it is, honestly:** a reconstruction, not a live screen capture. Every terminal
 line in it is copied from the committed runs in `../evidence/`; the frames were rendered
@@ -13,8 +13,11 @@ Scenes, in order: the one-answer problem; what Telegraph is, over a capture of t
 mission board; what Tina is, over a capture of this repository; who serves the intents; the
 test suite; pricing a decision; the live paid run; the memo; the evidence check; the signal
 lookup; the yield workflow refusing a single source; the mining workflow; desktop captures of
-the repository and the evidence folder; the closing call to check the repository; and a
-credits card for Athar.
+the repository and the evidence folder; and a credits card for Athar.
+
+The narration is written flat and specific on purpose: numbers, limits, and exactly two
+invitations to check the repository. No superlatives, no urgency, no promises beyond what the
+committed runs show.
 
 To re-record it live instead, follow `docs/USAGE.md` with a screen recorder running. That
 is the better artifact if you have two minutes: it is a real session, not a render.
