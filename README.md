@@ -156,6 +156,25 @@ truth/                   truth sources, and the signed uploader
 tests/                   unit tests
 ```
 
+## What the network did in these runs (19 Nov 2026, devnode)
+
+Recorded from the committed evidence, not editorialised:
+
+- **Escrow rail works.** 20 paid asks across the three runs settled from escrow, each
+  with a `receipt_hash` and a `signal_hash` in the run JSON.
+- **A fresh deposit is invisible to `/engine/v1/ask` for a while.** After funding,
+  `/v1/ledger/account` shows the balance immediately but asks return
+  `insufficient escrow for delivery: ... balance=0`; it clears once the node's
+  indexer catches up. Tina surfaces that refusal verbatim.
+- **`CRYPTO_YIELD_RATE_GENERAL` is thinly supplied.** Of 5 miners asked, 1 returned
+  `supply_apy`; two others answered with unrelated payloads. The yield workflow
+  therefore returns REVIEW, not PASS: one reading is not corroboration.
+- **Two miners return upstream bodies over the 8 MiB limit** (`TVL_LOOKUP_GENERAL`
+  and `ASSET_RESERVE_ATTESTATION_GENERAL`), which the node reports as a 500 after
+  payment. They were not billed.
+- **One miner answers a judgment intent with a 400** (`SANCTIONS_SCREENING_MATCH`:
+  `Missing 'prompt' field`), so that intent had a single source in the run.
+
 ## Missions
 
 - **01 Exchange** - `tina listing`
