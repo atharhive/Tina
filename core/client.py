@@ -132,6 +132,7 @@ class TelegraphClient:
         max_usd_per_day: float = 1.00,
         timeout: int = 120,
         dry_run: bool = False,
+        spend_log: "SpendLog | None" = None,
     ) -> None:
         self.node = node.rstrip("/")
         self.account = Account.from_key(wallet_key)
@@ -140,7 +141,7 @@ class TelegraphClient:
         self.max_usd_per_day = max_usd_per_day
         self.timeout = timeout
         self.dry_run = dry_run
-        self.spend = SpendLog()
+        self.spend = spend_log or SpendLog()
         self.run_spent = 0.0
         self.spent_today = self.spend.today()
 
@@ -354,13 +355,18 @@ class TelegraphClient:
 
 def _usd(price: Any) -> float:
     """Challenge prices arrive as '$0.01' or as micro-USDC ('10000')."""
+    if isinstance(price, bool):
+        return 0.0
     if isinstance(price, (int, float)):
         return float(price) / 1e6 if price > 100 else float(price)
-    text = str(price or "$0").strip().lstrip("$")
+    text = str(price or "").strip()
+    micro = not text.startswith("$")
+    text = text.lstrip("$")
     try:
-        return float(text)
+        value = float(text)
     except ValueError:
         return 0.0
+    return value / 1e6 if micro and value > 100 else value
 
 
 def _receipt(headers: dict[str, str]) -> dict[str, Any] | None:
