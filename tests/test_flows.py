@@ -12,9 +12,11 @@ from core.client import AskResult  # noqa: E402
 from core.flows import (  # noqa: E402
     Desk,
     Observation,
+    market_matches,
     median,
     score_listing,
     score_mining,
+    zone_tokens,
     score_stablecoin,
     score_yield,
     spread_pct,
@@ -163,6 +165,14 @@ def test_field_missing_is_counted_on_the_observation():
 
 
 # ---------------------------------------------------------------------- mining
+def test_zone_match_keeps_only_answers_about_that_market():
+    caiso = answer("GRID_POWER_PRICE_GENERAL", "1", {"lmp_usd_per_mwh": 55.84, "market": "CAISO day-ahead hourly LMP (DAM)", "node_or_zone": "TH_NP15_GEN-APND"})
+    europe = answer("GRID_POWER_PRICE_GENERAL", "2", {"lmp_usd_per_mwh": 109.18})
+    assert market_matches("CAISO NP15", caiso) is True
+    assert market_matches("CAISO NP15", europe) is False
+    assert zone_tokens("CAISO NP15") == {"caiso", "np15"}
+    assert market_matches("", europe) is True  # no zone to test against
+
 def test_mining_margin_arithmetic_is_stated():
     out = score_mining(hashprice_usd_per_ph_day=45, lmp_usd_per_mwh=30, hashrate_ph=1, efficiency_j_per_th=25, agreement={})
     eco = out["economics"]
