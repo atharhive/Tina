@@ -8,4 +8,4 @@ flows    the three due-diligence workflows and their verdict rules
 report   run evidence and markdown memos
 """
 
-__version__ = "2.0.0"
+__version__ = "2.1.0"
