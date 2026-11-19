@@ -9,6 +9,7 @@ that to what is in this repository.
 |---|---|---|
 | `tina listing` | 01 Exchange | `LIQUIDITY_DEPTH_VERIFY_GENERAL`, `TOKEN_HOLDER_COUNT_GENERAL`, `WASH_TRADING_DETECTION_GENERAL` |
 | `tina stablecoin` | 02 Stablecoin | `CRYPTO_PRICE_USD`, `ASSET_RESERVE_ATTESTATION_GENERAL`, `SANCTIONS_SCREENING_MATCH_GENERAL` |
+| `tina mining` | 12 Mining & Power | `GRID_POWER_PRICE_GENERAL`, `MINING_HASHPRICE_VERIFY_GENERAL` |
 | `tina yield` | 13 Asset Management | `CRYPTO_YIELD_RATE_GENERAL`, `TVL_LOOKUP_GENERAL` |
 
 Each workflow is its own command, its own scoring rule, its own failure mode and its
@@ -46,6 +47,28 @@ answer, and needs to know when either is unmeasured.
 - **Reproduce it:** swap `--symbol` / `--issuer` for another issuer.
 
 Evidence: `evidence/stablecoin-20261119T071634Z.*`
+
+## Mission 12 - Mining & Power
+
+A mining site decides weekly whether a rig stays switched on at a given power price. That
+is arithmetic on two bought numbers, and it is the clearest case where a wrong input
+silently destroys the decision.
+
+- **Run it:** `tina mining --zone "CAISO NP15" --block 920000 --hashrate-ph 1 --efficiency 25`
+- **Check it:** the memo prints the arithmetic (`power draw = hashrate * 1000 TH/PH * J/TH / 1000`,
+  revenue `= hashprice * PH`, power bill `= kW * 24h * LMP/1000`), the daily margin, and the
+  break-even power price.
+- **Inspect it:** every number comes from a paid answer with a receipt and a signal hash.
+- **Break it:** ask for a zone no miner prices, or a zone that gets answered with another
+  market's price. The second case is the interesting one: `GRID_POWER_PRICE_GENERAL` returned
+  a European day-ahead price for a CAISO zone, so the app compares the answer's own
+  `market`/`node_or_zone` labels to the requested zone, sets the mismatched answers aside,
+  and shows them in the memo instead of averaging two different markets.
+- **Reproduce it:** the same command with another zone and your own hashrate.
+
+Evidence: `evidence/mining-20261119T204316Z.*` - 1 PH at 25 J/TH against USD 55.84/MWh gives
+USD 14.37/day margin, 30% headroom to the USD 79.79/MWh break-even, verdict REVIEW because
+only one miner priced that zone.
 
 ## Mission 13 - Asset Management
 

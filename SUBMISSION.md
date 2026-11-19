@@ -8,7 +8,7 @@ nothing with an estimate without labelling it as one.
 
 **Project name:** Tina
 **Track:** Apps & Agents
-**Missions:** 01 Exchange, 02 Stablecoin, 13 Asset Management
+**Missions:** 01 Exchange, 02 Stablecoin, 12 Mining & Power, 13 Asset Management
 **GitHub username that starred the bounties repo:** `atharhive`
 **Reviewer link:** https://github.com/atharhive/Tina
 
@@ -45,11 +45,13 @@ corroborate. Cost is $0.04-$0.10 per decision on testnet, in about 20 seconds of
 wall-clock time. The difference is auditability, not model quality.
 
 **3. What does it do today?**
-Three workflows, 20 paid asks, all from escrow, all receipted. Real results from 19 Nov:
+Four workflows, 26 paid asks, all from escrow, all receipted. Real results from 19 Nov:
 WETH/USDC on Base showed $24,873,363.78 of liquidity agreed by three miners and 5.2M
 holders from two, verdict PASS 15/100; USDC showed a peg within 25 bps with an attested
 reserve and no sanctions match, PASS 0/100; aave-v3 USDC showed $13.84B TVL agreed by
-two miners but only one supply APY reading, which returns REVIEW 45/100 by design.
+two miners but only one supply APY reading, which returns REVIEW 45/100 by design; a CAISO NP15
+site at 1 PH and 25 J/TH showed a $14.37/day margin at $55.84/MWh, 30% headroom to break-even at
+$79.79/MWh, and the run set aside two answers that had priced a different market.
 
 **4. Why would someone adopt it?**
 Because the failure mode of an automated approval is a confident answer built on one
@@ -71,6 +73,8 @@ shows the cost without paying. Maintained by @atharhive.
    - shows 9 asks, $0.09 projected, no payment made.
 3. **Run it (60s).** the same command without `quote`. Point at the three miners
    agreeing on `$24,873,363.78`, at the miner that failed, and at the verdict line.
+   Optional second run: `tina mining --zone "CAISO NP15" --block 920000` and the
+   set-aside answers that priced a different market.
 4. **Evidence (60s).** open `runs/listing-*.md`, then
    `python3 scripts/verify_evidence.py runs/listing-*.json` and show 6/6 signals
    resolving on the node.

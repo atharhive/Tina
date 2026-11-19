@@ -24,6 +24,7 @@ Three workflows, each a different question, each with a numeric verdict:
 | `tina listing` | liquidity depth, holder count, wash-trading verdict | list / review / reject a token |
 | `tina stablecoin` | spot price, reserve attestation, sanctions screen | peg and counterparty health |
 | `tina yield` | supply APY, protocol TVL | is this yield plausible at this size |
+| `tina mining` | grid power price, Bitcoin hashprice | does this site make money at this power price |
 
 Each run prints a risk score out of 100 with its reasons, then writes a memo plus
 the raw answers and receipts.
@@ -83,6 +84,7 @@ wallet error. A reject is a successful run.
 |---|---|---|
 | `tina listing` | yes | token listing risk (3 intents) |
 | `tina stablecoin` | yes | peg, reserve and sanctions check (3 intents) |
+| `tina mining` | yes | mining margin against a grid price (2 intents) |
 | `tina yield` | yes | APY plausibility against TVL (2 intents) |
 | `tina quote <workflow>` | no | fetch the payment challenge and print the projected cost |
 | `tina health <intent or workflow>` | no | ranked miners, prices, answer fields |
@@ -124,6 +126,7 @@ One ask costs $0.01 on this node. A workflow buys 2-3 intents across 2-3 miners:
 - `yield`: 2 intents x 3 miners = 6 asks = **$0.06** per decision
 - `stablecoin`: 3 intents x 2-3 miners = **$0.06-$0.09**
 - `listing`: 3 intents x 2-3 miners = **$0.08-$0.10**
+- `mining`: 2 intents x 3 miners = **$0.06** per site decision
 
 A failed ask is never billed, so the printed cost is what the node charged.
 
@@ -164,8 +167,9 @@ evaluation pool instead of kept private:
 ./.venv/bin/python -m pytest tests -q
 ```
 
-14 tests, no network, no wallet, no spend: scoring thresholds, agreement counting,
-memo contents, and the failure path where one miner dies mid-run.
+45 tests, no network, no wallet, no spend: scoring thresholds, agreement counting,
+the mining arithmetic, zone matching against a mis-priced market, memo contents, and the
+failure paths where a miner dies mid-run or answers without the field that was asked for.
 
 ## Layout
 
@@ -203,6 +207,7 @@ Recorded from the committed evidence, not editorialised:
 
 - **01 Exchange** - `tina listing`
 - **02 Stablecoin** - `tina stablecoin`
+- **12 Mining & Power** - `tina mining`
 - **13 Asset Management** - `tina yield`
 
 MIT. See [LICENSE](LICENSE).
