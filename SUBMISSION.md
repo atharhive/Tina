@@ -67,7 +67,7 @@ shows the cost without paying. Maintained by @atharhive.
 
 ### Demo video
 
-`docs/demo/tina-demo.mp4` (4:10, narrated). It is a reconstruction rendered from the
+`docs/demo/tina-demo.mp4` (3:31, narrated). It is a reconstruction rendered from the
 committed run logs, not a live capture - `docs/demo/README.md` says so plainly. Raw link
 for the form: `https://github.com/atharhive/Tina/raw/main/docs/demo/tina-demo.mp4`
 
