@@ -37,7 +37,32 @@ def write_run(report: dict[str, Any], out_dir: Path) -> dict[str, Path]:
             indent=2,
         )
     )
+    _append_index(out_dir, report, run_path)
     return {"run": run_path, "memo": memo_path, "verdict": decision_path}
+
+
+def _append_index(out_dir: Path, report: dict[str, Any], run_path: Path) -> None:
+    """Keep one small index so a reviewer can see every run without opening them all."""
+    index_path = out_dir / "index.json"
+    try:
+        rows = json.loads(index_path.read_text())
+        if not isinstance(rows, list):
+            rows = []
+    except Exception:  # noqa: BLE001 - a missing index starts empty
+        rows = []
+    rows.append(
+        {
+            "run_id": report["run_id"],
+            "workflow": report["workflow"],
+            "mission": report.get("mission"),
+            "verdict": report["verdict"]["verdict"],
+            "risk_score": report["verdict"]["risk_score"],
+            "cost_usd": report.get("cost_usd"),
+            "generated_at": report["generated_at"],
+            "file": run_path.name,
+        }
+    )
+    index_path.write_text(json.dumps(rows[-200:], indent=2))
 
 
 def render_memo(report: dict[str, Any]) -> str:
