@@ -15,6 +15,28 @@ from typing import Any, Callable
 from .client import AskResult, PaymentRefused, TelegraphClient, TelegraphError
 
 
+# ------------------------------------------------------------------------- catalogue
+# One table for what each workflow buys: the intent, and which CLI input feeds each
+# upstream parameter. The workflows below and the free price estimate both read it,
+# so a workflow cannot drift from its own cost estimate.
+INTENTS: dict[str, list[dict[str, Any]]] = {
+    "listing": [
+        {"intent": "LIQUIDITY_DEPTH_VERIFY_GENERAL", "params": {"pool": "pool", "chain": "chain"}},
+        {"intent": "TOKEN_HOLDER_COUNT_GENERAL", "params": {"token": "token", "chain": "chain"}},
+        {"intent": "WASH_TRADING_DETECTION_GENERAL", "params": {"subject": "token"}},
+    ],
+    "stablecoin": [
+        {"intent": "CRYPTO_PRICE_USD", "params": {"symbol": "symbol"}},
+        {"intent": "ASSET_RESERVE_ATTESTATION_GENERAL", "params": {"asset": "asset"}},
+        {"intent": "SANCTIONS_SCREENING_MATCH_GENERAL", "params": {"name": "issuer"}},
+    ],
+    "yield": [
+        {"intent": "CRYPTO_YIELD_RATE_GENERAL", "params": {"project": "project", "symbol": "symbol", "chain": "chain"}},
+        {"intent": "TVL_LOOKUP_GENERAL", "params": {"protocol": "project"}},
+    ],
+}
+
+
 # --------------------------------------------------------------------------- agreement
 def median(values: list[Any]) -> float | None:
     clean = [float(v) for v in values if isinstance(v, (int, float)) and not isinstance(v, bool)]

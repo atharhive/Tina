@@ -23,6 +23,7 @@ from pathlib import Path
 
 from core import __version__
 from core.client import PaymentRefused, TelegraphClient, TelegraphError
+from core.catalogue import plan
 from core.flows import Desk, listing_check, stablecoin_check, yield_check
 from core.report import write_run
 from core.wallet import WalletError, load_wallet
@@ -105,33 +106,25 @@ def cmd_yield(args: argparse.Namespace) -> int:
 def cmd_quote(args: argparse.Namespace) -> int:
     """Price a workflow without paying: one challenge per intent, no signature."""
     client = _client(args)
-    planned = {
-        "listing": [
-            ("LIQUIDITY_DEPTH_VERIFY_GENERAL", {"pool": getattr(args, "pool", "0x0"), "chain": getattr(args, "chain", "base")}),
-            ("TOKEN_HOLDER_COUNT_GENERAL", {"token": getattr(args, "token", "0x0"), "chain": getattr(args, "chain", "base")}),
-            ("WASH_TRADING_DETECTION_GENERAL", {"subject": getattr(args, "token", "0x0")}),
-        ],
-        "stablecoin": [
-            ("CRYPTO_PRICE_USD", {"symbol": getattr(args, "symbol", "USDC")}),
-            ("ASSET_RESERVE_ATTESTATION_GENERAL", {"asset": getattr(args, "asset", "USDC")}),
-            ("SANCTIONS_SCREENING_MATCH_GENERAL", {"name": getattr(args, "issuer", "Circle")}),
-        ],
-        "yield": [
-            ("CRYPTO_YIELD_RATE_GENERAL", {"project": getattr(args, "project", "aave-v3"), "symbol": getattr(args, "symbol", "USDC"), "chain": getattr(args, "chain", "ethereum")}),
-            ("TVL_LOOKUP_GENERAL", {"protocol": getattr(args, "project", "aave-v3")}),
-        ],
-    }[args.workflow]
-
-    total = 0.0
-    for intent, params in planned:
-        try:
-            quote = client.quote(intent, params)
-            price = quote["escrow_price_usd"] or 0.0
-            total += price * args.miners
-            print(f"{intent:38} ${price:.2f}/ask x {args.miners} miners  escrow={quote['escrow_available']}")
-        except TelegraphError as exc:
-            print(f"{intent:38} unavailable: {exc}")
-    print(f"\nprojected cost for this run: ${total:.4f} USDC")
+    inputs = {
+        "token": args.token,
+        "pool": args.pool,
+        "chain": args.chain,
+        "symbol": args.symbol,
+        "asset": args.asset,
+        "issuer": args.issuer,
+        "project": args.project,
+    }
+    estimate = plan(client, args.workflow, inputs, args.miners)
+    for row in estimate["asks"]:
+        if "error" in row:
+            print(f"{row['intent']:38} unavailable: {row['error']}")
+            continue
+        print(
+            f"{row['intent']:38} ${row['price_usd']:.2f}/ask x {args.miners} miners  "
+            f"escrow={row['escrow_available']}"
+        )
+    print(f"\nprojected cost for this run: ${estimate['projected_usd']:.4f} USDC")
     return 0
 
 
