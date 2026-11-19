@@ -23,7 +23,7 @@ from pathlib import Path
 
 from core import __version__
 from core.client import PaymentRefused, TelegraphClient, TelegraphError
-from core.catalogue import plan
+from core.catalogue import health, miners, plan, workflow_health
 from core.flows import Desk, listing_check, stablecoin_check, yield_check
 from core.report import write_run
 from core.wallet import WalletError, load_wallet
@@ -128,6 +128,44 @@ def cmd_quote(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_miners(args: argparse.Namespace) -> int:
+    """Who serves an intent, at what price, in what order. Free."""
+    client = _client(args)
+    rows = miners(client, args.intent, args.limit)
+    if not rows:
+        print(f"no active miner serves {args.intent}")
+        return 1
+    print(f"{'rank':>5}  {'id':>8}  {'slug':32}  {'price':>7}  requests")
+    for m in rows:
+        rank = "-" if m.get("rank") is None else str(m["rank"])
+        print(f"{rank:>5}  {m['id']:>8}  {(m.get('slug') or '')[:32]:32}  {m['price_usd']:>7.4f}  {m['requests_served']}")
+    return 0
+
+
+def cmd_health(args: argparse.Namespace) -> int:
+    """How buyable an intent or a whole workflow looks right now. Free."""
+    client = _client(args)
+    if args.target in {"listing", "stablecoin", "yield"}:
+        report = workflow_health(client, args.target)
+        rows = report["intents"]
+    else:
+        rows = [health(client, args.target)]
+    ok = True
+    for row in rows:
+        if "error" in row:
+            ok = False
+            print(f"{row['intent']:38} {row['error']}")
+            continue
+        fields = ", ".join(row["fields"][:4])
+        print(
+            f"{row['intent']:38} ranked={row['miners_ranked']:>2}/{row['miners_registered']:<4} "
+            f"price={row['cheapest_usd']}-{row['priciest_usd']} fields=[{fields}]"
+        )
+        if not row["miners_ranked"]:
+            ok = False
+    return 0 if ok else 1
+
+
 def cmd_account(args: argparse.Namespace) -> int:
     """Read-only: wallet address and one escrow quote. No payment, no signature."""
     wallet = load_wallet(args.wallet)
@@ -204,6 +242,15 @@ def build_parser() -> argparse.ArgumentParser:
     q.add_argument("--issuer", default="Circle")
     q.add_argument("--project", default="aave-v3")
     q.set_defaults(func=cmd_quote)
+
+    mn = sub.add_parser("miners", parents=[common], help="ranked miners for an intent, with prices (free)")
+    mn.add_argument("intent")
+    mn.add_argument("--limit", type=int, default=10)
+    mn.set_defaults(func=cmd_miners)
+
+    hl = sub.add_parser("health", parents=[common], help="supply and price for an intent or workflow (free)")
+    hl.add_argument("target", help="an intent name, or one of listing, stablecoin, yield")
+    hl.set_defaults(func=cmd_health)
 
     ac = sub.add_parser("account", parents=[common], help="show the wallet address and escrow quote (free)")
     ac.set_defaults(func=cmd_account)
