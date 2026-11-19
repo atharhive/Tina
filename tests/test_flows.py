@@ -14,6 +14,7 @@ from core.flows import (  # noqa: E402
     Observation,
     median,
     score_listing,
+    score_mining,
     score_stablecoin,
     score_yield,
     spread_pct,
@@ -159,6 +160,40 @@ def test_field_missing_is_counted_on_the_observation():
     field = obs.field("supply_apy")
     assert field.missing == 1
     assert field.median == 400
+
+
+# ---------------------------------------------------------------------- mining
+def test_mining_margin_arithmetic_is_stated():
+    out = score_mining(hashprice_usd_per_ph_day=45, lmp_usd_per_mwh=30, hashrate_ph=1, efficiency_j_per_th=25, agreement={})
+    eco = out["economics"]
+    assert eco["power_kw"] == 25          # 1 PH = 1000 TH, 25 J/TH = 25 kW
+    assert eco["revenue_usd_per_day"] == 45
+    assert eco["power_cost_usd_per_day"] == 18   # 25 kW * 24h * $0.03/kWh
+    assert eco["margin_usd_per_day"] == 27
+    assert eco["margin_pct"] == 60.0
+    assert eco["breakeven_lmp_usd_per_mwh"] == 75.0
+    assert out["verdict"] == "PASS"
+
+
+def test_mining_at_expensive_power_is_rejected():
+    out = score_mining(hashprice_usd_per_ph_day=40, lmp_usd_per_mwh=90, hashrate_ph=1, efficiency_j_per_th=25, agreement={})
+    assert out["economics"]["margin_usd_per_day"] < 0
+    assert out["verdict"] == "REJECT"
+    assert any("loses" in r for r in out["reasons"])
+
+
+def test_mining_without_a_power_price_cannot_be_computed():
+    out = score_mining(hashprice_usd_per_ph_day=45, lmp_usd_per_mwh=None, hashrate_ph=1, efficiency_j_per_th=25, agreement={})
+    assert out["verdict"] != "PASS"
+    assert out["economics"]["margin_usd_per_day"] is None
+    assert any("cannot be computed" in r for r in out["reasons"])
+
+
+def test_mining_effort_efficiency_changes_the_power_bill():
+    efficient = score_mining(hashprice_usd_per_ph_day=45, lmp_usd_per_mwh=30, hashrate_ph=1, efficiency_j_per_th=20, agreement={})
+    thirsty = score_mining(hashprice_usd_per_ph_day=45, lmp_usd_per_mwh=30, hashrate_ph=1, efficiency_j_per_th=40, agreement={})
+    assert thirsty["economics"]["power_kw"] > efficient["economics"]["power_kw"]
+    assert thirsty["risk_score"] > efficient["risk_score"]
 
 
 # -------------------------------------------------------------------- evidence
