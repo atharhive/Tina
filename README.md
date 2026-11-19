@@ -77,6 +77,29 @@ Every paid run:
 Exit codes: `0` pass/review, `2` reject, `3` payment refused, `4` network or
 wallet error. A reject is a successful run.
 
+## Every command
+
+| Command | Costs money? | What it does |
+|---|---|---|
+| `tina listing` | yes | token listing risk (3 intents) |
+| `tina stablecoin` | yes | peg, reserve and sanctions check (3 intents) |
+| `tina yield` | yes | APY plausibility against TVL (2 intents) |
+| `tina quote <workflow>` | no | fetch the payment challenge and print the projected cost |
+| `tina health <intent or workflow>` | no | ranked miners, prices, answer fields |
+| `tina miners <intent>` | no | ranked miners for one intent, with prices |
+| `tina signal <hash>` | no | resolve a paid answer's delivery record |
+| `tina spend` | no | what the caps have been charged, per day |
+| `tina replay <run.json>` | no | re-render a memo from saved evidence |
+| `tina account` | no | wallet address and an escrow quote |
+| `tina intents [--search]` | no | the intent catalogue this node serves |
+
+## Docs
+
+- [`docs/USAGE.md`](docs/USAGE.md) - real transcripts, exit codes
+- [`docs/MISSIONS.md`](docs/MISSIONS.md) - how each workflow meets its mission
+- [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) - every error these runs hit
+- [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) - how to add a workflow
+
 ## Evidence a reviewer can check
 
 ```
