@@ -79,9 +79,35 @@ def render_memo(report: dict[str, Any]) -> str:
     for key, value in (report.get("input") or {}).items():
         lines.append(f"- `{key}`: {value}")
     lines.append("")
+    economics = (verdict.get("economics") or {}) if isinstance(verdict, dict) else {}
+    if economics.get("margin_usd_per_day") is not None:
+        lines.append("")
+        lines.append("## Numbers")
+        for key, label in (
+            ("hashrate_ph", "hashrate (PH/s)"),
+            ("efficiency_j_per_th", "efficiency (J/TH)"),
+            ("power_kw", "power draw (kW)"),
+            ("revenue_usd_per_day", "revenue (USD/day)"),
+            ("power_cost_usd_per_day", "power cost (USD/day)"),
+            ("margin_usd_per_day", "margin (USD/day)"),
+            ("margin_pct", "margin (%)"),
+            ("breakeven_lmp_usd_per_mwh", "break-even power price (USD/MWh)"),
+        ):
+            if economics.get(key) is not None:
+                lines.append(f"- {label}: {economics[key]:,}")
+
+    lines.append("")
     lines.append("## Why")
     for reason in verdict.get("reasons") or ["no risk factors triggered"]:
         lines.append(f"- {reason}")
+    excluded = report.get("excluded") or []
+    if excluded:
+        lines.append("")
+        lines.append("## Bought but set aside")
+        lines.append("These answers were paid for and priced a different market than the zone asked about:")
+        for row in excluded:
+            lines.append(f"- {row.get('miner')} (id {row.get('miner_id')}): {row.get('market') or 'no market label'}, zone {row.get('zone') or 'unlabelled'}")
+
     lines.append("")
     lines.append("## What was bought")
     for obs in report.get("observations", []):
