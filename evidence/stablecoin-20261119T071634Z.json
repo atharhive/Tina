@@ -1,0 +1,311 @@
+{
+  "workflow": "stablecoin",
+  "mission": "Mission 02 Stablecoin",
+  "input": {
+    "symbol": "USDC",
+    "asset": "USDC",
+    "issuer": "Circle"
+  },
+  "verdict": {
+    "risk_score": 0.0,
+    "verdict": "PASS",
+    "reasons": [
+      "attested reserve reported: 73,956,687,701,000,000 units",
+      "issuer does not match a sanctions list"
+    ]
+  },
+  "observations": [
+    {
+      "intent": "CRYPTO_PRICE_USD",
+      "params": {
+        "symbol": "USDC"
+      },
+      "asked": 3,
+      "answered": 2,
+      "cost_usd": 0.02,
+      "error": null,
+      "answers": [
+        {
+          "intent": "CRYPTO_PRICE_USD",
+          "params": {
+            "symbol": "USDC"
+          },
+          "miner_id": "32005",
+          "miner_name": "Bitstamp Spot Price",
+          "status": 200,
+          "result": {
+            "price_usd": 0.99983
+          },
+          "receipt": {
+            "receipt_hash": "0x0b2990a4353f6acfca875c60daa9b83d88b93fc8e9bbd1b7656725ad08475206",
+            "rail": "escrow",
+            "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+            "miner": "2867",
+            "intent": "CRYPTO_PRICE_USD",
+            "amount_uusdc": "10000",
+            "epoch_id": 15,
+            "settlement": "epoch",
+            "chain": "telegraph",
+            "timestamp": 1795072588
+          },
+          "signal_hash": "0xfde611ae907fffbeae9ff74a5528837432316dbc981b75efcff386c3111ded3d",
+          "delivery": null,
+          "field_status": {
+            "price_usd": "ok"
+          },
+          "price_usd": 0.01,
+          "rail": "escrow",
+          "elapsed_ms": 468,
+          "request_id": "",
+          "error": null
+        },
+        {
+          "intent": "CRYPTO_PRICE_USD",
+          "params": {
+            "symbol": "USDC"
+          },
+          "miner_id": "4433",
+          "miner_name": "LiveCert \u2014 Sourced Answers for Agents",
+          "status": 200,
+          "result": {
+            "price_usd": 0.99983
+          },
+          "receipt": {
+            "receipt_hash": "0xe4be24e147a92606041141c170519aff4b6438b4405b5807fb6b5e0ff07ac6dc",
+            "rail": "escrow",
+            "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+            "miner": "6115",
+            "intent": "CRYPTO_PRICE_USD",
+            "amount_uusdc": "10000",
+            "epoch_id": 15,
+            "settlement": "epoch",
+            "chain": "telegraph",
+            "timestamp": 1795072588
+          },
+          "signal_hash": "0x4e49733c586664b6eb24e4a83f201ae9f4e2bfad2e2f0c48baed1ac50e1159e4",
+          "delivery": null,
+          "field_status": {
+            "price_usd": "ok"
+          },
+          "price_usd": 0.01,
+          "rail": "escrow",
+          "elapsed_ms": 536,
+          "request_id": "",
+          "error": null
+        },
+        {
+          "intent": "CRYPTO_PRICE_USD",
+          "params": {
+            "symbol": "USDC"
+          },
+          "miner_id": "9107",
+          "miner_name": "CryptoPulse Multi-Source Price",
+          "status": 0,
+          "result": null,
+          "receipt": null,
+          "signal_hash": null,
+          "delivery": null,
+          "field_status": null,
+          "price_usd": 0.0,
+          "rail": null,
+          "elapsed_ms": 0,
+          "request_id": "",
+          "error": "HTTP 500 after payment: upstream call failed: status 502: {\"status\":\"error\",\"error\":\"Unsupported asset: USDC\"}"
+        }
+      ]
+    },
+    {
+      "intent": "ASSET_RESERVE_ATTESTATION_GENERAL",
+      "params": {
+        "asset": "USDC"
+      },
+      "asked": 3,
+      "answered": 2,
+      "cost_usd": 0.02,
+      "error": null,
+      "answers": [
+        {
+          "intent": "ASSET_RESERVE_ATTESTATION_GENERAL",
+          "params": {
+            "asset": "USDC"
+          },
+          "miner_id": "20260828",
+          "miner_name": "PREFLIGHT Infrastructure Signals",
+          "status": 200,
+          "result": {
+            "asset": null,
+            "attested_reserve": null,
+            "block": null,
+            "checked_at": "2026-11-19T07:16:29.505Z",
+            "collateral_ratio_pct": null,
+            "confidence": 0.8,
+            "found": false,
+            "reason": "No Chainlink proof-of-reserve feed on Ethereum is known for that asset. Covered: WBTC, cbBTC, stETH, TUSD, LBTC, eETH, FBTC, SolvBTC, uniBTC.",
+            "reserve": null,
+            "round_id": null,
+            "source": null,
+            "total_supply": null,
+            "updated_at": null,
+            "verdict": "not_found"
+          },
+          "receipt": {
+            "receipt_hash": "0x87e5d63b512eb14fb1e3b9eb7e31f5d8029800f4eaa393e4e3119952eaeab4d8",
+            "rail": "escrow",
+            "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+            "miner": "5311",
+            "intent": "ASSET_RESERVE_ATTESTATION_GENERAL",
+            "amount_uusdc": "10000",
+            "epoch_id": 15,
+            "settlement": "epoch",
+            "chain": "telegraph",
+            "timestamp": 1795072590
+          },
+          "signal_hash": "0x6fddab19b6b4bbe1427e4b90712eee2a37f4e8b6d83a8842da2a705a698a5403",
+          "delivery": null,
+          "field_status": null,
+          "price_usd": 0.01,
+          "rail": "escrow",
+          "elapsed_ms": 1299,
+          "request_id": "",
+          "error": null
+        },
+        {
+          "intent": "ASSET_RESERVE_ATTESTATION_GENERAL",
+          "params": {
+            "asset": "USDC"
+          },
+          "miner_id": "27741",
+          "miner_name": "por-attest",
+          "status": 200,
+          "result": {
+            "attested_reserve": 73956687701000000,
+            "asset": "USDC",
+            "block": "2026-09-30",
+            "source": "Independent accountants' examination (Big Four firm per Circle; AICPA attestation standards) report for Circle"
+          },
+          "receipt": {
+            "receipt_hash": "0xbe0ae36c376464e2ca28130ff10d0322905d0a2b1889f9bbf0cd6fe7627dd9c5",
+            "rail": "escrow",
+            "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+            "miner": "4865",
+            "intent": "ASSET_RESERVE_ATTESTATION_GENERAL",
+            "amount_uusdc": "10000",
+            "epoch_id": 15,
+            "settlement": "epoch",
+            "chain": "telegraph",
+            "timestamp": 1795072592
+          },
+          "signal_hash": "0x372765f563e4844f2124290a6f6684e85f46ba4c3b136cee3cc5e305c37d5e89",
+          "delivery": null,
+          "field_status": {
+            "attested_reserve": "ok",
+            "asset": "ok",
+            "block": "ok",
+            "source": "ok"
+          },
+          "price_usd": 0.01,
+          "rail": "escrow",
+          "elapsed_ms": 2219,
+          "request_id": "",
+          "error": null
+        },
+        {
+          "intent": "ASSET_RESERVE_ATTESTATION_GENERAL",
+          "params": {
+            "asset": "USDC"
+          },
+          "miner_id": "81005",
+          "miner_name": "DefiLlama Aave V3 Protocol",
+          "status": 0,
+          "result": null,
+          "receipt": null,
+          "signal_hash": null,
+          "delivery": null,
+          "field_status": null,
+          "price_usd": 0.0,
+          "rail": null,
+          "elapsed_ms": 0,
+          "request_id": "",
+          "error": "HTTP 500 after payment: upstream call failed: response body exceeds 8388608 byte limit"
+        }
+      ]
+    },
+    {
+      "intent": "SANCTIONS_SCREENING_MATCH_GENERAL",
+      "params": {
+        "name": "Circle"
+      },
+      "asked": 2,
+      "answered": 1,
+      "cost_usd": 0.01,
+      "error": null,
+      "answers": [
+        {
+          "intent": "SANCTIONS_SCREENING_MATCH_GENERAL",
+          "params": {
+            "name": "Circle"
+          },
+          "miner_id": "84392",
+          "miner_name": "Sanctions & Watchlist Screening Miner",
+          "status": 0,
+          "result": null,
+          "receipt": null,
+          "signal_hash": null,
+          "delivery": null,
+          "field_status": null,
+          "price_usd": 0.0,
+          "rail": null,
+          "elapsed_ms": 0,
+          "request_id": "",
+          "error": "HTTP 500 after payment: upstream error 400: {\"detail\":\"Missing 'prompt' field in request body.\"}"
+        },
+        {
+          "intent": "SANCTIONS_SCREENING_MATCH_GENERAL",
+          "params": {
+            "name": "Circle"
+          },
+          "miner_id": "78004",
+          "miner_name": "OpenSanctions US OFAC Index",
+          "status": 200,
+          "result": {
+            "name": "us_ofac_sdn",
+            "matched": null,
+            "matches": null,
+            "lists": null,
+            "match_score": null
+          },
+          "receipt": {
+            "receipt_hash": "0xef726b96e011c738ff32c7663c914113b45992d81d7473a7ff701068bb084277",
+            "rail": "escrow",
+            "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+            "miner": "3829",
+            "intent": "SANCTIONS_SCREENING_MATCH_GENERAL",
+            "amount_uusdc": "10000",
+            "epoch_id": 15,
+            "settlement": "epoch",
+            "chain": "telegraph",
+            "timestamp": 1795072594
+          },
+          "signal_hash": "0x47b52142a92ac40ed90b814c9c3cf19c90a8d57822762f63b525da17bc8f2498",
+          "delivery": null,
+          "field_status": {
+            "name": "ok",
+            "matched": "missing",
+            "matches": "missing",
+            "lists": "rejected",
+            "match_score": "missing"
+          },
+          "price_usd": 0.01,
+          "rail": "escrow",
+          "elapsed_ms": 574,
+          "request_id": "",
+          "error": null
+        }
+      ]
+    }
+  ],
+  "cost_usd": 0.05,
+  "gaps": [],
+  "run_id": "stablecoin-20261119T071634Z",
+  "generated_at": "2026-11-19T07:16:34.326647+00:00"
+}

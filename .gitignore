@@ -6,3 +6,5 @@ dist/
 __pycache__/
 .next/
 reports/
+.venv/
+runs/

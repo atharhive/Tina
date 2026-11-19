@@ -1,0 +1,19 @@
+{
+  "run_id": "yield-20261119T071539Z",
+  "workflow": "yield",
+  "mission": "Mission 13 Asset Management",
+  "input": {
+    "project": "aave-v3",
+    "symbol": "USDC",
+    "chain": "ethereum"
+  },
+  "verdict": {
+    "risk_score": 10.0,
+    "verdict": "PASS",
+    "reasons": [
+      "1 answering miner(s) returned no supply_apy: the evidence is thinner than it looks"
+    ]
+  },
+  "cost_usd": 0.04,
+  "gaps": []
+}

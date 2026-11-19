@@ -1,56 +1,165 @@
 # Tina
 
-> Autonomous multi-source verification and due-diligence terminal on Telegraph Protocol.
+> Corroborated due diligence, bought one answer at a time on Telegraph.
+
+Tina is a small, auditable desk that **buys the same question from several
+independent Telegraph miners** and turns their answers into a decision a human can
+check: list the token, review the issuer, or walk away.
+
+One miner's answer is an opinion backed by nobody. Tina's product is the
+**agreement**: it pays every miner separately, stores every receipt, and reports
+where they disagree. Disagreement is the signal a single-model tool cannot give you.
+
+Testnet only. Real money is never involved: the token is the Sepolia test USDC and
+every ask is paid from a Telegraph escrow balance.
 
 ---
 
-## 1. Thesis
+## What it does
 
-A consumer platform that has to decide whether a claim, link, or offer is trustworthy faces a practical problem: a single model can be wrong, stale, or unavailable. Paying for specialist intelligence can help, but only if the request, answer, cost, and limits are visible and testable.
+Three workflows, each a different question, each with a numeric verdict:
 
-Tina is an early prototype exploring that workflow through Telegraph. The current code is deliberately in **dry-run mode**. It does not yet make paid requests, corroborate independent answers, or produce current receipts. Those capabilities are goals, not shipped behavior.
+| Command | Buys | Decision |
+|---|---|---|
+| `tina listing` | liquidity depth, holder count, wash-trading verdict | list / review / reject a token |
+| `tina stablecoin` | spot price, reserve attestation, sanctions screen | peg and counterparty health |
+| `tina yield` | supply APY, protocol TVL | is this yield plausible at this size |
 
----
-
-## 2. Current implementation
-
-The repository contains a small Python CLI. By default it prints the supplied target and reports a dry-run status without making network requests or spending funds. `--execute` is intentionally disabled until a safe live flow is verified.
-
-The live request helper is not enabled from the CLI. Any future implementation must use a fresh, unexposed test wallet, the exact live Intent schema, a verified price/quote, explicit spending ceilings, and auditable response evidence. No current per-signal price is claimed.
-
----
-
-## 3. Evidence status
-
-The repository previously listed three signal/receipt pairs as live-verifiable. As of **November 17, 2026**, the public Devnode returns `signal not found` for the documented moderation signal. Those historical identifiers are therefore not presented here as currently verified evidence. The app has not yet demonstrated a reproducible, current Telegraph purchase with a result and verifiable accounting record from a fresh input.
-
-Track 2 is separate: the public evaluation API currently reports this contributor's existing rows as eligible (20 moderation, 6 keyword extraction, 6 grammar/spell-check). Pool snapshots and eligibility are not proof of prize payment or earnings.
-
-Before using a new signal as proof, verify it against the current public endpoint and record the returned request, result, network, actual price, and available receipt/accounting evidence. Do not infer settlement from an HTTP 200 or a payment challenge.
+Each run prints a risk score out of 100 with its reasons, then writes a memo plus
+the raw answers and receipts.
 
 ---
 
-## 4. Run the safe prototype
-
-### Requirements
-- Python 3.10+
+## Install
 
 ```bash
-git clone https://github.com/atharhive/Tina.git
-cd Tina
-python3 core/engine.py --target "Suspicious sponsored offer promising guaranteed weekly returns"
+python3 -m venv .venv
+./.venv/bin/pip install -r requirements.txt
 ```
 
-Expected behavior: prints `DRY RUN: no requests sent and no funds spent.` No key, Node dependency, or network connection is needed for this path. `--execute` currently exits without making a request.
+## Fund a test wallet (Sepolia, testnet only)
 
----
+Tina signs one EIP-191 message per ask, so it needs a key and an escrow balance,
+not a gas-funded wallet.
 
-## 5. Project status
+```bash
+# 1. A wallet. The Telegraph MCP CLI creates one and prints the address.
+npx -y @telegraphprotocol/telegraph-protocol-mcp setup
 
-Tina is an unfinished prototype and is not currently a qualifying, independently reproducible paid Telegraph application. The original Consumer Platform mission issue is #195; it is currently claimed by another contributor, so this repository does not claim that mission. The team has not verified a fresh paid app flow or a prize award.
+# 2. Test USDC (the Sepolia test token has an open mint, no faucet queue):
+./.venv/bin/python scripts/fund_testnet.py mint 3
 
-The existing evaluation submissions are a separate Track 2 contribution. As of November 17, 2026, the public API reports 20 eligible moderation rows, 6 eligible keyword-extraction rows, and 6 eligible grammar/spell-check rows for the contributor. This is not a payout confirmation.
+# 3. Deposit into the escrow balance of the node's Diamond, then read it back:
+./.venv/bin/python scripts/fund_testnet.py deposit 2.5
+curl -s https://devnode.telegraphprotocol.com/v1/ledger/account/<your address>
+```
 
-## License
+`available` in that last response is what asks may spend. The ledger shows a
+deposit immediately; the ask path may not see it until the node's next epoch
+(3 hours), so Tina reports the refusal verbatim instead of pretending it paid.
 
-MIT. See [LICENSE](LICENSE). See also `.env.example` for configuration names; never commit real credentials.
+## Run
+
+```bash
+./.venv/bin/python cli.py quote yield --project aave-v3     # price it, pay nothing
+./.venv/bin/python cli.py yield --project aave-v3 --symbol USDC --chain ethereum
+./.venv/bin/python cli.py stablecoin --symbol USDC --asset USDC --issuer Circle
+./.venv/bin/python cli.py listing --token 0x... --pool 0x... --chain base --size-usd 25000
+```
+
+Every paid run:
+
+- prints what each miner charged and whether it answered;
+- refuses an ask over `--max-ask`, a run over `--max-run`, a day over `--max-day`;
+- writes `runs/<workflow>-<timestamp>.json` (all answers, receipts, prices),
+  `runs/<workflow>-<timestamp>.md` (the memo) and a small `.verdict.json`.
+
+Exit codes: `0` pass/review, `2` reject, `3` payment refused, `4` network or
+wallet error. A reject is a successful run.
+
+## Evidence a reviewer can check
+
+```
+runs/yield-20261119T093012Z.md             memo: verdict, reasons, cost, receipts
+runs/yield-20261119T093012Z.json           every ask: miner id, params, result, receipt
+runs/yield-20261119T093012Z.verdict.json   the decision alone
+```
+
+Each ask in the JSON carries its `result`, the `price_usd` actually charged and the
+node's `X-PAYMENT-RESPONSE` receipt, so every claim in the memo traces to a paid
+call. `~/.tina/spend.json` holds the per-UTC-day spend the caps enforce.
+
+`evidence/` in this repo holds three real runs committed as they were produced:
+one per workflow, with their receipts and signal hashes. Nothing in them was
+edited after the run.
+
+## Cost per outcome
+
+One ask costs $0.01 on this node. A workflow buys 2-3 intents across 2-3 miners:
+
+- `yield`: 2 intents x 3 miners = 6 asks = **$0.06** per decision
+- `stablecoin`: 3 intents x 2-3 miners = **$0.06-$0.09**
+- `listing`: 3 intents x 2-3 miners = **$0.08-$0.10**
+
+A failed ask is never billed, so the printed cost is what the node charged.
+
+## Failure handling
+
+- **A miner fails:** the answer is recorded as failed, the workflow continues, and
+  the memo lists the gap. Two good answers are still a result; one is not, and the
+  memo says so.
+- **Escrow refuses:** the run stops before spending anything else and prints the
+  node's exact reason.
+- **Miners disagree:** disagreement adds risk instead of being averaged away.
+- **Nothing answers:** the verdict cannot be PASS. Missing data is never good news.
+
+## What Tina does not do
+
+- It does not claim settlement. It reports the receipt the node returned.
+- It does not treat agreement as truth. Several miners can share one bad source;
+  agreement measures consistency, not correctness.
+- It does not run on mainnet and makes no claim about production pricing.
+- It does not hide the escrow indexing delay: every run that hit it says so, in the
+  evidence, with the node's own error text.
+
+## Evaluation material
+
+`truth/` holds the truth sources Tina's own workflows depend on, uploaded to the
+evaluation pool instead of kept private:
+
+- `truth-coinbase-spot.yaml` - `CRYPTO_PRICE_USD` from Coinbase's keyless rates API
+- `truth-frankfurter-ecb.yaml` - `CURRENCY_EXCHANGE_CONVERT` from ECB reference rates
+
+```bash
+./.venv/bin/python truth/upload_truth_source.py truth/truth-coinbase-spot.yaml CRYPTO_PRICE_USD
+```
+
+## Tests
+
+```bash
+./.venv/bin/python -m pytest tests -q
+```
+
+14 tests, no network, no wallet, no spend: scoring thresholds, agreement counting,
+memo contents, and the failure path where one miner dies mid-run.
+
+## Layout
+
+```
+cli.py                   argument parsing and exit codes
+core/client.py           node client: escrow payment, caps, receipts
+core/flows.py            the three workflows and their pure scoring rules
+core/report.py           run evidence and memos
+core/wallet.py           key loading, never logged
+scripts/fund_testnet.py  test USDC mint and escrow deposit
+truth/                   truth sources, and the signed uploader
+tests/                   unit tests
+```
+
+## Missions
+
+- **01 Exchange** - `tina listing`
+- **02 Stablecoin** - `tina stablecoin`
+- **13 Asset Management** - `tina yield`
+
+MIT. See [LICENSE](LICENSE).

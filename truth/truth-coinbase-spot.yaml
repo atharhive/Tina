@@ -1,0 +1,43 @@
+version: "1"
+kind: miner
+id: 0
+slug: truth-coinbase-spot
+protocol: generic
+name: Coinbase spot rates (truth source)
+description: >-
+  Public, keyless Coinbase exchange rates for one asset symbol. Serves
+  CRYPTO_PRICE_USD: the asset symbol goes in, the latest USD price comes out.
+  Coinbase quotes rates per unit of the requested currency, so rates.USD is the
+  asset's price in US dollars.
+base_url: https://api.coinbase.com
+auth:
+  type: none
+endpoints:
+  - path: /spot
+    external_path: /v2/exchange-rates
+    method: GET
+    description: Latest USD price for one crypto asset symbol.
+    intents: [CRYPTO_PRICE_USD]
+    params:
+      query:
+        required:
+          - name: symbol
+            type: string
+            intents: ["*"]
+            description: Asset symbol, upper case, for example ETH or BTC.
+    param_map:
+      symbol: currency
+intent_mapping:
+  CRYPTO_PRICE_USD:
+    endpoint: /spot
+    input:
+      currency:
+        from: symbol
+        how: "Crypto asset symbol, upper case, for example ETH."
+    output:
+      price_usd:
+        path: "data.rates.USD"
+        unit: USD
+semantics:
+  supported_intents:
+    - CRYPTO_PRICE_USD

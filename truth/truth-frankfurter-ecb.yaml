@@ -1,0 +1,55 @@
+version: "1"
+kind: miner
+id: 0
+slug: truth-frankfurter-ecb
+protocol: generic
+name: Frankfurter ECB rates (truth source)
+description: >-
+  Public, keyless exchange-rate API serving the ECB daily reference rates.
+  Serves CURRENCY_EXCHANGE_CONVERT: a from currency, a to currency and an
+  optional amount in, the converted amount out.
+base_url: https://api.frankfurter.app
+auth:
+  type: none
+endpoints:
+  - path: /convert
+    external_path: /latest
+    method: GET
+    description: Convert an amount from one currency into another using ECB reference rates.
+    intents: [CURRENCY_EXCHANGE_CONVERT]
+    params:
+      query:
+        required:
+          - name: from_currency
+            type: string
+            intents: ["*"]
+            description: ISO 4217 code to convert from, upper case, for example USD.
+          - name: to_currency
+            type: string
+            intents: ["*"]
+            description: ISO 4217 code to convert into, upper case, for example EUR.
+        optional:
+          - name: amount
+            type: number
+            intents: ["*"]
+            description: Amount to convert, in the from currency. Defaults to 1.
+    param_map:
+      from_currency: from
+      to_currency: to
+intent_mapping:
+  CURRENCY_EXCHANGE_CONVERT:
+    endpoint: /convert
+    input:
+      from:
+        from: from_currency
+        how: "ISO 4217 code to convert from, upper case."
+      to:
+        from: to_currency
+        how: "ISO 4217 code to convert into, upper case."
+    output:
+      converted_amount:
+        path: "rates.{to}"
+        unit: "{to}"
+semantics:
+  supported_intents:
+    - CURRENCY_EXCHANGE_CONVERT

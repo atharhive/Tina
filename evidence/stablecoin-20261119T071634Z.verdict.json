@@ -1,0 +1,20 @@
+{
+  "run_id": "stablecoin-20261119T071634Z",
+  "workflow": "stablecoin",
+  "mission": "Mission 02 Stablecoin",
+  "input": {
+    "symbol": "USDC",
+    "asset": "USDC",
+    "issuer": "Circle"
+  },
+  "verdict": {
+    "risk_score": 0.0,
+    "verdict": "PASS",
+    "reasons": [
+      "attested reserve reported: 73,956,687,701,000,000 units",
+      "issuer does not match a sanctions list"
+    ]
+  },
+  "cost_usd": 0.05,
+  "gaps": []
+}

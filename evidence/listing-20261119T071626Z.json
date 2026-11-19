@@ -1,0 +1,322 @@
+{
+  "workflow": "listing",
+  "mission": "Mission 01 Exchange",
+  "input": {
+    "token": "0x4200000000000000000000000000000000000006",
+    "pool": "0xd0b53D9277642d899DF5C87A3966A349A798F224",
+    "chain": "base",
+    "trade_usd": 25000.0
+  },
+  "verdict": {
+    "risk_score": 15.0,
+    "verdict": "PASS",
+    "reasons": [
+      "1 answering miner(s) returned no wash_volume_pct: the evidence is thinner than it looks",
+      "wash-trading share not reported"
+    ]
+  },
+  "observations": [
+    {
+      "intent": "LIQUIDITY_DEPTH_VERIFY_GENERAL",
+      "params": {
+        "pool": "0xd0b53D9277642d899DF5C87A3966A349A798F224",
+        "chain": "base"
+      },
+      "asked": 3,
+      "answered": 3,
+      "cost_usd": 0.03,
+      "error": null,
+      "answers": [
+        {
+          "intent": "LIQUIDITY_DEPTH_VERIFY_GENERAL",
+          "params": {
+            "pool": "0xd0b53D9277642d899DF5C87A3966A349A798F224",
+            "chain": "base"
+          },
+          "miner_id": "7373",
+          "miner_name": "VerifyWire Liquidity Depth",
+          "status": 200,
+          "result": {
+            "liquidity_usd": 24848492.2854
+          },
+          "receipt": {
+            "receipt_hash": "0x602d7f519c690d815c1e6c1e605c65a2654f8b1030426fab39fa4848b777f568",
+            "rail": "escrow",
+            "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+            "miner": "4434",
+            "intent": "LIQUIDITY_DEPTH_VERIFY_GENERAL",
+            "amount_uusdc": "10000",
+            "epoch_id": 15,
+            "settlement": "epoch",
+            "chain": "telegraph",
+            "timestamp": 1795072570
+          },
+          "signal_hash": "0xfd034643e0df75cee2a68faaadaee047e72bc27820a363997f29439872b49dd9",
+          "delivery": null,
+          "field_status": {
+            "liquidity_usd": "ok"
+          },
+          "price_usd": 0.01,
+          "rail": "escrow",
+          "elapsed_ms": 2804,
+          "request_id": "",
+          "error": null
+        },
+        {
+          "intent": "LIQUIDITY_DEPTH_VERIFY_GENERAL",
+          "params": {
+            "pool": "0xd0b53D9277642d899DF5C87A3966A349A798F224",
+            "chain": "base"
+          },
+          "miner_id": "77081",
+          "miner_name": "VerifyWire Exact Pool Liquidity",
+          "status": 200,
+          "result": {
+            "liquidity_usd": 24848492.2854
+          },
+          "receipt": {
+            "receipt_hash": "0xad05aa60daf97778eead3039b8e91bfb33ce81f80db41991bf5213364157393c",
+            "rail": "escrow",
+            "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+            "miner": "5059",
+            "intent": "LIQUIDITY_DEPTH_VERIFY_GENERAL",
+            "amount_uusdc": "10000",
+            "epoch_id": 15,
+            "settlement": "epoch",
+            "chain": "telegraph",
+            "timestamp": 1795072570
+          },
+          "signal_hash": "0x74e7006feaec9a8c8ae9bd30b2d8145979c950f9f87fe3224eebc3936b200b8d",
+          "delivery": null,
+          "field_status": {
+            "liquidity_usd": "ok"
+          },
+          "price_usd": 0.01,
+          "rail": "escrow",
+          "elapsed_ms": 256,
+          "request_id": "",
+          "error": null
+        },
+        {
+          "intent": "LIQUIDITY_DEPTH_VERIFY_GENERAL",
+          "params": {
+            "pool": "0xd0b53D9277642d899DF5C87A3966A349A798F224",
+            "chain": "base"
+          },
+          "miner_id": "9002",
+          "miner_name": "TxLens",
+          "status": 200,
+          "result": {
+            "liquidity_usd": 24871901.68
+          },
+          "receipt": {
+            "receipt_hash": "0x9f90a3a6fcccb8ae582fd3b1ff687294e096d67ed870bcccdc369eb34d5465f5",
+            "rail": "escrow",
+            "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+            "miner": "6121",
+            "intent": "LIQUIDITY_DEPTH_VERIFY_GENERAL",
+            "amount_uusdc": "10000",
+            "epoch_id": 15,
+            "settlement": "epoch",
+            "chain": "telegraph",
+            "timestamp": 1795072571
+          },
+          "signal_hash": "0xe68c7d1d1497c0714df0149701e079942318b81894b6a5f7efa31abaeb5c8011",
+          "delivery": null,
+          "field_status": {
+            "liquidity_usd": "ok"
+          },
+          "price_usd": 0.01,
+          "rail": "escrow",
+          "elapsed_ms": 1424,
+          "request_id": "",
+          "error": null
+        }
+      ]
+    },
+    {
+      "intent": "TOKEN_HOLDER_COUNT_GENERAL",
+      "params": {
+        "token": "0x4200000000000000000000000000000000000006",
+        "chain": "base"
+      },
+      "asked": 3,
+      "answered": 2,
+      "cost_usd": 0.02,
+      "error": null,
+      "answers": [
+        {
+          "intent": "TOKEN_HOLDER_COUNT_GENERAL",
+          "params": {
+            "token": "0x4200000000000000000000000000000000000006",
+            "chain": "base"
+          },
+          "miner_id": "302",
+          "miner_name": "ChainSight \u2014 Universal Intelligence & Data Oracle",
+          "status": 0,
+          "result": null,
+          "receipt": null,
+          "signal_hash": null,
+          "delivery": null,
+          "field_status": null,
+          "price_usd": 0.0,
+          "rail": null,
+          "elapsed_ms": 0,
+          "request_id": "",
+          "error": "HTTP 503 from /engine/v1/ask/302: {\"error\":\"could not route this question now, try again later\"}"
+        },
+        {
+          "intent": "TOKEN_HOLDER_COUNT_GENERAL",
+          "params": {
+            "token": "0x4200000000000000000000000000000000000006",
+            "chain": "base"
+          },
+          "miner_id": "7302",
+          "miner_name": "ChainWire Token Holder Count",
+          "status": 200,
+          "result": {
+            "token": "0x4200000000000000000000000000000000000006",
+            "chain": "base",
+            "holders_count": 5245995,
+            "token_symbol": "WETH"
+          },
+          "receipt": {
+            "receipt_hash": "0x0346152521502134d0ced9497e51a6920c0a34448c1b188ccd0677bae60086a2",
+            "rail": "escrow",
+            "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+            "miner": "5375",
+            "intent": "TOKEN_HOLDER_COUNT_GENERAL",
+            "amount_uusdc": "10000",
+            "epoch_id": 15,
+            "settlement": "epoch",
+            "chain": "telegraph",
+            "timestamp": 1795072577
+          },
+          "signal_hash": "0x8422e963d68d59c8ab860c39d14dc4747865b875534deb33f90bacdf08e19ff0",
+          "delivery": null,
+          "field_status": {
+            "token": "ok",
+            "chain": "ok",
+            "holders_count": "ok",
+            "token_symbol": "ok"
+          },
+          "price_usd": 0.01,
+          "rail": "escrow",
+          "elapsed_ms": 3012,
+          "request_id": "",
+          "error": null
+        },
+        {
+          "intent": "TOKEN_HOLDER_COUNT_GENERAL",
+          "params": {
+            "token": "0x4200000000000000000000000000000000000006",
+            "chain": "base"
+          },
+          "miner_id": "73606",
+          "miner_name": "ChainWire Dated Holder Observations",
+          "status": 200,
+          "result": {
+            "token": "0x4200000000000000000000000000000000000006",
+            "chain": "base",
+            "holders_count": 5245995,
+            "token_symbol": "WETH"
+          },
+          "receipt": {
+            "receipt_hash": "0x79822478cdd1f615c36fde498cf2d4292eb42f8134fcc5680565f533995fa0a5",
+            "rail": "escrow",
+            "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+            "miner": "5098",
+            "intent": "TOKEN_HOLDER_COUNT_GENERAL",
+            "amount_uusdc": "10000",
+            "epoch_id": 15,
+            "settlement": "epoch",
+            "chain": "telegraph",
+            "timestamp": 1795072580
+          },
+          "signal_hash": "0x9b6e1f250f1c176fe213402a0f0cf7e6250d88030b8613cc00d5440a80af26ba",
+          "delivery": null,
+          "field_status": {
+            "token": "ok",
+            "chain": "ok",
+            "holders_count": "ok",
+            "token_symbol": "ok"
+          },
+          "price_usd": 0.01,
+          "rail": "escrow",
+          "elapsed_ms": 2397,
+          "request_id": "",
+          "error": null
+        }
+      ]
+    },
+    {
+      "intent": "WASH_TRADING_DETECTION_GENERAL",
+      "params": {
+        "subject": "0x4200000000000000000000000000000000000006"
+      },
+      "asked": 2,
+      "answered": 1,
+      "cost_usd": 0.01,
+      "error": null,
+      "answers": [
+        {
+          "intent": "WASH_TRADING_DETECTION_GENERAL",
+          "params": {
+            "subject": "0x4200000000000000000000000000000000000006"
+          },
+          "miner_id": "7378",
+          "miner_name": "VerifyWire Wash Trading Detection",
+          "status": 0,
+          "result": null,
+          "receipt": null,
+          "signal_hash": null,
+          "delivery": null,
+          "field_status": null,
+          "price_usd": 0.0,
+          "rail": null,
+          "elapsed_ms": 0,
+          "request_id": "",
+          "error": "HTTP 500 after payment: upstream call failed: status 502: {\n \"intent\": \"WASH_TRADING_DETECTION_GENERAL\",\n \"subject\": \"0x4200000000000000000000000000000000000006\",\n \"chain\": \"ethereum\",\n \"verdict\": \"inconclusive\",\n \"wash_volume_pct\": null,\n \"wash_volume_status\": \"unavailable\",\n \"verified\": false,\n \"error\": \"evidence_unavail"
+        },
+        {
+          "intent": "WASH_TRADING_DETECTION_GENERAL",
+          "params": {
+            "subject": "0x4200000000000000000000000000000000000006"
+          },
+          "miner_id": "80003",
+          "miner_name": "DexScreener Pair",
+          "status": 200,
+          "result": {
+            "pair": null,
+            "pairs": null,
+            "schemaVersion": "1.0.0"
+          },
+          "receipt": {
+            "receipt_hash": "0x25f3c6b54f1ab1417438f8b4a5a0d5d5a333decb06d7a045026f337772e7dc49",
+            "rail": "escrow",
+            "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+            "miner": "4278",
+            "intent": "WASH_TRADING_DETECTION_GENERAL",
+            "amount_uusdc": "10000",
+            "epoch_id": 15,
+            "settlement": "epoch",
+            "chain": "telegraph",
+            "timestamp": 1795072586
+          },
+          "signal_hash": "0x26a2e4157f8dfe090748a73aa5885432336cac28ea34e916f53bb3df3e552b9f",
+          "delivery": null,
+          "field_status": null,
+          "price_usd": 0.01,
+          "rail": "escrow",
+          "elapsed_ms": 409,
+          "request_id": "",
+          "error": null
+        }
+      ]
+    }
+  ],
+  "cost_usd": 0.06,
+  "gaps": [],
+  "run_id": "listing-20261119T071626Z",
+  "generated_at": "2026-11-19T07:16:26.509345+00:00"
+}
