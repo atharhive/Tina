@@ -25,7 +25,7 @@ from core import __version__
 from core.client import PaymentRefused, SpendLog, TelegraphClient, TelegraphError
 from core.catalogue import health, miners, plan, workflow_health
 from core.flows import Desk, listing_check, stablecoin_check, yield_check
-from core.report import write_run
+from core.report import render_memo, write_run
 from core.wallet import WalletError, load_wallet
 
 
@@ -125,6 +125,26 @@ def cmd_quote(args: argparse.Namespace) -> int:
             f"escrow={row['escrow_available']}"
         )
     print(f"\nprojected cost for this run: ${estimate['projected_usd']:.4f} USDC")
+    return 0
+
+
+def cmd_replay(args: argparse.Namespace) -> int:
+    """Re-render a memo from saved evidence, without buying anything again."""
+    path = Path(args.run)
+    if not path.exists():
+        print(f"no such run file: {path}")
+        return 1
+    report = json.loads(path.read_text())
+    memo = render_memo(report)
+    if args.write:
+        target = path.with_suffix(".replayed.md")
+        target.write_text(memo)
+        print(f"memo written to {target}")
+    else:
+        print(memo)
+    verdict = report["verdict"]
+    print(f"replay: {verdict['verdict']} (risk {verdict['risk_score']}/100), "
+          f"cost ${report.get('cost_usd', 0):.4f}, {len(report.get('observations', []))} intents")
     return 0
 
 
@@ -271,6 +291,11 @@ def build_parser() -> argparse.ArgumentParser:
     q.add_argument("--issuer", default="Circle")
     q.add_argument("--project", default="aave-v3")
     q.set_defaults(func=cmd_quote)
+
+    rp = sub.add_parser("replay", parents=[common], help="re-render a memo from a saved run (free)")
+    rp.add_argument("run")
+    rp.add_argument("--write", action="store_true", help="write <run>.replayed.md instead of printing")
+    rp.set_defaults(func=cmd_replay)
 
     sg = sub.add_parser("signal", parents=[common], help="look up a paid answer's delivery record (free)")
     sg.add_argument("hash")
