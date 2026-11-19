@@ -115,11 +115,12 @@ def score_listing(
     wash_verdict: str | None,
     agreement: dict[str, float | None],
     missing: dict[str, int] | None = None,
+    thin: bool = False,
 ) -> dict[str, Any]:
     """Score a token listing request from 0 (safe) to 100 (do not list)."""
     risk = 0.0
     reasons: list[str] = []
-    risk += _evidence_penalty(missing, reasons)
+    risk += _evidence_penalty(missing, thin, reasons)
 
     if holders is None:
         risk += 20
@@ -172,11 +173,12 @@ def score_stablecoin(
     sanctioned: bool | None,
     agreement: dict[str, float | None],
     missing: dict[str, int] | None = None,
+    thin: bool = False,
 ) -> dict[str, Any]:
     """Score a stablecoin/treasury exposure from 0 (safe) to 100 (avoid)."""
     risk = 0.0
     reasons: list[str] = []
-    risk += _evidence_penalty(missing, reasons)
+    risk += _evidence_penalty(missing, thin, reasons)
 
     if price_usd is None:
         risk += 40
@@ -220,11 +222,12 @@ def score_yield(
     has_yield_data: bool,
     agreement: dict[str, float | None],
     missing: dict[str, int] | None = None,
+    thin: bool = False,
 ) -> dict[str, Any]:
     """Score a yield opportunity from 0 (sane) to 100 (implausible)."""
     risk = 0.0
     reasons: list[str] = []
-    risk += _evidence_penalty(missing, reasons)
+    risk += _evidence_penalty(missing, thin, reasons)
 
     if not has_yield_data or apy_bps is None:
         risk += 30
@@ -259,9 +262,19 @@ def score_yield(
     return {"risk_score": round(risk, 1), "verdict": _band(risk), "reasons": reasons}
 
 
-def _evidence_penalty(missing: dict[str, int] | None, reasons: list[str]) -> float:
+def _thin(observations: list[Observation]) -> bool:
+    """True when the run has no corroboration on its main signal, or nothing on a required one."""
+    if not observations:
+        return True
+    return len(observations[0].answered) < 2 or any(len(o.answered) == 0 for o in observations)
+
+
+def _evidence_penalty(missing: dict[str, int] | None, thin: bool, reasons: list[str]) -> float:
     """Risk added when the evidence itself is thin: silent fields, one source."""
     risk = 0.0
+    if thin:
+        risk += 35
+        reasons.append("only one miner answered: no corroboration, so this is a single opinion")
     for name, count in (missing or {}).items():
         if count:
             risk += 10 * min(count, 2)
@@ -366,6 +379,7 @@ def listing_check(
             "holders_count": holders.missing,
             "wash_volume_pct": wash_pct.missing,
         },
+        thin=_thin(observations) or len(liquidity.values) < 2,
     )
     return {
         "workflow": "listing",
@@ -408,6 +422,7 @@ def stablecoin_check(
             "attested_reserve": reserve.missing,
             "sanctions_match": sanctioned.missing,
         },
+        thin=_thin(observations) or len(price.values) < 2,
     )
     return {
         "workflow": "stablecoin",
@@ -439,6 +454,7 @@ def yield_check(
         has_yield_data=bool(observations[0].answered),
         agreement={"supply_apy": apy.agreement, "tvl_usd": tvl.agreement},
         missing={"supply_apy": apy.missing, "tvl_usd": tvl.missing},
+        thin=_thin(observations) or len(apy.values) < 2,
     )
     return {
         "workflow": "yield",
