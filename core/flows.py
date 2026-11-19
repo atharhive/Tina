@@ -85,15 +85,23 @@ class Observation:
         numeric = [v for v in values if isinstance(v, (int, float)) and not isinstance(v, bool)]
         text = [str(v) for v in values]
         mode = statistics.mode(text) if text else None
+        mid = median(numeric)
+        if numeric and mid:
+            # Numbers agree within 1% of the median; exact match would flag float noise.
+            near = [v for v in numeric if abs(v - mid) <= abs(mid) * 0.01]
+            agreement = round(len(near) / len(numeric), 3)
+        else:
+            agreement = round(text.count(mode) / len(text), 3) if text and mode is not None else None
         return FieldRead(
             name=name,
             values=values,
-            median=median(numeric),
+            median=mid,
             spread_pct=spread_pct(numeric),
             mode=mode,
-            agreement=round(text.count(mode) / len(text), 3) if text and mode is not None else None,
+            agreement=agreement,
             missing=len(answered) - len(values),
         )
+
     def as_dict(self) -> dict[str, Any]:
         return {
             "intent": self.intent,
