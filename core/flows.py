@@ -34,6 +34,10 @@ INTENTS: dict[str, list[dict[str, Any]]] = {
         {"intent": "CRYPTO_YIELD_RATE_GENERAL", "params": {"project": "project", "symbol": "symbol", "chain": "chain"}},
         {"intent": "TVL_LOOKUP_GENERAL", "params": {"protocol": "project"}},
     ],
+    "mining": [
+        {"intent": "GRID_POWER_PRICE_GENERAL", "params": {"node_or_zone": "zone", "interval_start": "interval"}},
+        {"intent": "MINING_HASHPRICE_VERIFY_GENERAL", "params": {"block_height": "block"}},
+    ],
 }
 
 
@@ -312,6 +316,92 @@ def _evidence_penalty(missing: dict[str, int] | None, thin: bool, reasons: list[
     return risk
 
 
+def score_mining(
+    hashprice_usd_per_ph_day: float | None,
+    lmp_usd_per_mwh: float | None,
+    hashrate_ph: float,
+    efficiency_j_per_th: float,
+    agreement: dict[str, float | None],
+    missing: dict[str, int] | None = None,
+    thin: bool = False,
+) -> dict[str, Any]:
+    """Score a mining site's economics from 0 (healthy margin) to 100 (losing money).
+
+    The arithmetic is stated in the reasons so a reviewer can redo it by hand:
+    power draw kW = hashrate (PH) * 1000 TH/PH * J/TH / 1000 W/kW, revenue is
+    hashprice per PH-day, and the power bill is kW * 24h * LMP/1000 per kWh.
+    """
+    risk = 0.0
+    reasons: list[str] = []
+    risk += _evidence_penalty(missing, thin, reasons)
+
+    details: dict[str, Any] = {
+        "hashrate_ph": hashrate_ph,
+        "efficiency_j_per_th": efficiency_j_per_th,
+    }
+    if hashprice_usd_per_ph_day is None or lmp_usd_per_mwh is None:
+        risk += 40
+        missing_sides = [
+            name
+            for name, value in (("hashprice", hashprice_usd_per_ph_day), ("power price", lmp_usd_per_mwh))
+            if value is None
+        ]
+        reasons.append(f"no {' and no '.join(missing_sides)}: the margin cannot be computed")
+        details["margin_usd_per_day"] = None
+        return {"risk_score": round(min(100.0, risk), 1), "verdict": _band(min(100.0, risk)), "reasons": reasons, "economics": details}
+
+    power_kw = hashrate_ph * 1000 * efficiency_j_per_th / 1000
+    revenue = hashprice_usd_per_ph_day * hashrate_ph
+    cost_per_kwh = lmp_usd_per_mwh / 1000
+    cost = power_kw * 24 * cost_per_kwh
+    margin = revenue - cost
+    margin_pct = (margin / revenue * 100) if revenue else 0.0
+    breakeven_lmp = (revenue / (power_kw * 24) * 1000) if power_kw else None
+
+    details.update(
+        {
+            "power_kw": round(power_kw, 2),
+            "revenue_usd_per_day": round(revenue, 2),
+            "power_cost_usd_per_day": round(cost, 2),
+            "margin_usd_per_day": round(margin, 2),
+            "margin_pct": round(margin_pct, 1),
+            "cost_per_kwh": round(cost_per_kwh, 5),
+            "breakeven_lmp_usd_per_mwh": round(breakeven_lmp, 2) if breakeven_lmp else None,
+        }
+    )
+    reasons.append(
+        f"${revenue:,.2f}/day revenue against ${cost:,.2f}/day power for {power_kw:,.0f} kW "
+        f"at ${cost_per_kwh:.4f}/kWh"
+    )
+
+    if margin < 0:
+        risk += 65
+        reasons.append(f"the site loses ${abs(margin):,.2f}/day at this power price")
+    elif margin_pct < 15:
+        risk += 35
+        reasons.append(f"margin is {margin_pct:.1f}%: one price move from unprofitable")
+    elif margin_pct < 40:
+        risk += 15
+        reasons.append(f"margin is {margin_pct:.1f}%")
+
+    if breakeven_lmp is not None:
+        headroom = (breakeven_lmp - lmp_usd_per_mwh) / breakeven_lmp * 100 if breakeven_lmp else 0.0
+        reasons.append(
+            f"break-even power price is ${breakeven_lmp:,.2f}/MWh: {headroom:.1f}% headroom before the site stops paying for itself"
+        )
+        if headroom < 10:
+            risk += 15
+            reasons.append("less than 10% headroom on power price")
+
+    for name, value in agreement.items():
+        if value is not None and value < 1.0:
+            risk += 10
+            reasons.append(f"miners disagree on {name} (agreement {value:.0%})")
+
+    risk = max(0.0, min(100.0, risk))
+    return {"risk_score": round(risk, 1), "verdict": _band(risk), "reasons": reasons, "economics": details}
+
+
 def _band(risk: float) -> str:
     if risk >= 60:
         return "REJECT"
@@ -490,6 +580,51 @@ def yield_check(
         "workflow": "yield",
         "mission": "Mission 13 Asset Management",
         "input": {"project": project, "symbol": symbol, "chain": chain},
+        "verdict": verdict,
+        "observations": [o.as_dict() for o in observations],
+        "cost_usd": round(sum(o.cost_usd for o in observations), 6),
+        "gaps": [o.error for o in observations if o.error],
+    }
+
+
+def mining_check(
+    desk: Desk,
+    zone: str,
+    block: int,
+    hashrate_ph: float,
+    efficiency_j_per_th: float,
+    interval: str,
+    on_event: Callable[[str], None] | None = None,
+) -> dict[str, Any]:
+    observations = [
+        desk.observe(
+            "GRID_POWER_PRICE_GENERAL",
+            {"node_or_zone": zone, "interval_start": interval},
+            on_event=on_event,
+        ),
+        desk.observe("MINING_HASHPRICE_VERIFY_GENERAL", {"block_height": block}, on_event=on_event),
+    ]
+    lmp = observations[0].field("lmp_usd_per_mwh")
+    hashprice = observations[1].field("hashprice_usd_per_ph_day")
+    verdict = score_mining(
+        hashprice_usd_per_ph_day=hashprice.median,
+        lmp_usd_per_mwh=lmp.median,
+        hashrate_ph=hashrate_ph,
+        efficiency_j_per_th=efficiency_j_per_th,
+        agreement={"power_price": lmp.agreement, "hashprice": hashprice.agreement},
+        missing={"lmp_usd_per_mwh": lmp.missing, "hashprice_usd_per_ph_day": hashprice.missing},
+        thin=_thin(observations) or len(lmp.values) < 2 or len(hashprice.values) < 2,
+    )
+    return {
+        "workflow": "mining",
+        "mission": "Mission 12 Mining & Power",
+        "input": {
+            "zone": zone,
+            "block": block,
+            "interval": interval,
+            "hashrate_ph": hashrate_ph,
+            "efficiency_j_per_th": efficiency_j_per_th,
+        },
         "verdict": verdict,
         "observations": [o.as_dict() for o in observations],
         "cost_usd": round(sum(o.cost_usd for o in observations), 6),

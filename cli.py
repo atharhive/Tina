@@ -19,12 +19,13 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 from core import __version__
 from core.client import PaymentRefused, SpendLog, TelegraphClient, TelegraphError
 from core.catalogue import health, miners, plan, workflow_health
-from core.flows import Desk, listing_check, stablecoin_check, yield_check
+from core.flows import Desk, listing_check, mining_check, stablecoin_check, yield_check
 from core.report import render_memo, write_run
 from core.wallet import WalletError, load_wallet
 
@@ -103,6 +104,37 @@ def cmd_yield(args: argparse.Namespace) -> int:
     return _finish(args, report)
 
 
+def _interval(value: str | None) -> str:
+    """Default settlement interval: the current hour, in UTC, as the intent expects."""
+    if value:
+        return value
+    now = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
+    return now.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def cmd_mining(args: argparse.Namespace) -> int:
+    client = _client(args)
+    desk = Desk(client, miners_per_intent=args.miners)
+    report = mining_check(
+        desk,
+        zone=args.zone,
+        block=args.block,
+        hashrate_ph=args.hashrate_ph,
+        efficiency_j_per_th=args.efficiency,
+        interval=_interval(args.interval),
+        on_event=None if args.quiet else print,
+    )
+    economics = report["verdict"].get("economics", {})
+    if economics.get("margin_usd_per_day") is not None:
+        print(
+            f"\n{economics['hashrate_ph']:g} PH at {economics['efficiency_j_per_th']:g} J/TH = "
+            f"{economics['power_kw']:,.0f} kW; revenue ${economics['revenue_usd_per_day']:,.2f}/day, "
+            f"power ${economics['power_cost_usd_per_day']:,.2f}/day, margin "
+            f"${economics['margin_usd_per_day']:,.2f}/day ({economics['margin_pct']}%)"
+        )
+    return _finish(args, report)
+
+
 def cmd_quote(args: argparse.Namespace) -> int:
     """Price a workflow without paying: one challenge per intent, no signature."""
     client = _client(args)
@@ -114,6 +146,9 @@ def cmd_quote(args: argparse.Namespace) -> int:
         "asset": args.asset,
         "issuer": args.issuer,
         "project": args.project,
+        "zone": getattr(args, "zone", ""),
+        "block": getattr(args, "block", 0),
+        "interval": _interval(getattr(args, "interval", None)),
     }
     estimate = plan(client, args.workflow, inputs, args.miners)
     for row in estimate["asks"]:
@@ -280,8 +315,16 @@ def build_parser() -> argparse.ArgumentParser:
     yc.add_argument("--chain", default="ethereum")
     yc.set_defaults(func=cmd_yield)
 
+    mn2 = sub.add_parser("mining", parents=[common], help="mining margin at a power price (Mission 12)")
+    mn2.add_argument("--zone", required=True, help="pricing node or bidding zone, e.g. ERCOT.HB_NORTH")
+    mn2.add_argument("--block", type=int, required=True, help="Bitcoin block height for the hashprice read")
+    mn2.add_argument("--hashrate-ph", type=float, default=1.0, help="site hashrate in PH/s (default 1)")
+    mn2.add_argument("--efficiency", type=float, default=25.0, help="rig efficiency in J/TH (default 25)")
+    mn2.add_argument("--interval", default=None, help="settlement interval start (default: this hour, UTC)")
+    mn2.set_defaults(func=cmd_mining)
+
     q = sub.add_parser("quote", parents=[common], help="price a workflow without paying")
-    q.add_argument("workflow", choices=["listing", "stablecoin", "yield"])
+    q.add_argument("workflow", choices=["listing", "stablecoin", "yield", "mining"])
     q.add_argument("--token", default=None)
     q.add_argument("--pool", default=None)
     q.add_argument("--chain", default="base")
@@ -290,6 +333,9 @@ def build_parser() -> argparse.ArgumentParser:
     q.add_argument("--asset", default="USDC")
     q.add_argument("--issuer", default="Circle")
     q.add_argument("--project", default="aave-v3")
+    q.add_argument("--zone", default="ERCOT.HB_NORTH")
+    q.add_argument("--block", type=int, default=920000)
+    q.add_argument("--interval", default=None)
     q.set_defaults(func=cmd_quote)
 
     rp = sub.add_parser("replay", parents=[common], help="re-render a memo from a saved run (free)")
