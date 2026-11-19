@@ -176,6 +176,16 @@ class TelegraphClient:
     def intent_meta(self, intent: str) -> dict[str, Any]:
         return self._get(f"/engine/v1/intents/{intent}")
 
+    def signal(self, signal_hash: str) -> dict[str, Any]:
+        """A delivery record by hash: who was paid, for which intent, and when.
+
+        This is the node's own copy of an answer Tina paid for, so a reviewer can
+        check a memo claim without trusting the memo.
+        """
+        if not signal_hash.startswith("0x"):
+            signal_hash = "0x" + signal_hash
+        return self._get(f"/engine/v1/signal/{signal_hash}")
+
     def miners_for(self, intent: str, limit: int = 5) -> list[dict[str, Any]]:
         """Best-ranked live miners for an intent, with id, slug, price and rank."""
         rows = self._get(f"/api/miners?intent={intent}&limit=200")

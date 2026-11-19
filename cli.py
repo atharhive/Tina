@@ -128,6 +128,23 @@ def cmd_quote(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_signal(args: argparse.Namespace) -> int:
+    """Look a signal hash up on the node: the delivery record behind a paid answer. Free."""
+    client = _client(args)
+    try:
+        record = client.signal(args.hash)
+    except TelegraphError as exc:
+        print(f"signal not found or unavailable: {exc}")
+        return 1
+    signal = record.get("signal", record)
+    for key in ("signal_hash", "kind", "wallet_address", "miner_slug", "intent_id", "created_at"):
+        if signal.get(key) is not None:
+            print(f"{key:15} {signal[key]}")
+    if args.json:
+        print(json.dumps(record, indent=2))
+    return 0
+
+
 def cmd_spend(args: argparse.Namespace) -> int:
     """What the caps have actually been charged, per UTC day. Free."""
     log = SpendLog()
@@ -254,6 +271,10 @@ def build_parser() -> argparse.ArgumentParser:
     q.add_argument("--issuer", default="Circle")
     q.add_argument("--project", default="aave-v3")
     q.set_defaults(func=cmd_quote)
+
+    sg = sub.add_parser("signal", parents=[common], help="look up a paid answer's delivery record (free)")
+    sg.add_argument("hash")
+    sg.set_defaults(func=cmd_signal)
 
     sp = sub.add_parser("spend", parents=[common], help="what the caps have been charged, per day (free)")
     sp.set_defaults(func=cmd_spend)
