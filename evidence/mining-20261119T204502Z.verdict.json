@@ -1,0 +1,36 @@
+{
+  "run_id": "mining-20261119T204502Z",
+  "workflow": "mining",
+  "mission": "Mission 12 Mining & Power",
+  "input": {
+    "zone": "CAISO NP15",
+    "block": 920000,
+    "interval": "2026-11-19T20:00:00Z",
+    "hashrate_ph": 1.0,
+    "efficiency_j_per_th": 25.0
+  },
+  "verdict": {
+    "risk_score": 50.0,
+    "verdict": "REVIEW",
+    "reasons": [
+      "excluded 2 answer(s) that priced a different market than CAISO NP15: unlabelled",
+      "only one miner answered: no corroboration, so this is a single opinion",
+      "$47.89/day revenue against $33.50/day power for 25 kW at $0.0558/kWh",
+      "margin is 30.0%",
+      "break-even power price is $79.81/MWh: 30.0% headroom before the site stops paying for itself"
+    ],
+    "economics": {
+      "hashrate_ph": 1.0,
+      "efficiency_j_per_th": 25.0,
+      "power_kw": 25.0,
+      "revenue_usd_per_day": 47.89,
+      "power_cost_usd_per_day": 33.5,
+      "margin_usd_per_day": 14.38,
+      "margin_pct": 30.0,
+      "cost_per_kwh": 0.05584,
+      "breakeven_lmp_usd_per_mwh": 79.81
+    }
+  },
+  "cost_usd": 0.06,
+  "gaps": []
+}
