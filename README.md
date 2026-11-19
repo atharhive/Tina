@@ -99,6 +99,7 @@ wallet error. A reject is a successful run.
 - [`docs/MISSIONS.md`](docs/MISSIONS.md) - how each workflow meets its mission
 - [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) - every error these runs hit
 - [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) - how to add a workflow
+- [`docs/TUTORIAL.md`](docs/TUTORIAL.md) - build this yourself in thirty minutes
 
 ## Evidence a reviewer can check
 
