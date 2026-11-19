@@ -65,6 +65,12 @@ supplied ones.
 `python3 cli.py listing --token ... --pool ... --chain base`. A free `quote` command
 shows the cost without paying. Maintained by @atharhive.
 
+### Demo video
+
+`docs/demo/tina-demo.mp4` (2:02, narrated). It is a reconstruction rendered from the
+committed run logs, not a live capture - `docs/demo/README.md` says so plainly. Raw link
+for the form: `https://github.com/atharhive/Tina/raw/main/docs/demo/tina-demo.mp4`
+
 ### Demo script (2-5 minutes)
 
 1. **Problem (20s).** "This is a listing review. One model says yes, and nobody can
