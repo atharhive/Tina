@@ -25,7 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from eth_account import Account  # noqa: E402
 from eth_account.messages import encode_defunct  # noqa: E402
 
-from core.wallet import load_wallet  # noqa: E402
+from colony.wallet import load_wallet  # noqa: E402
 
 NODE = "https://devnode.telegraphprotocol.com"
 CHAIN_ID = "11155111"
