@@ -1,213 +1,132 @@
-# Tina
+# Colony
 
-> Corroborated due diligence, bought one answer at a time on Telegraph.
+> A swarm that prices a question before it answers it.
 
-Tina is a small, auditable desk that **buys the same question from several
-independent Telegraph miners** and turns their answers into a decision a human can
-check: list the token, review the issuer, or walk away.
+Colony turns one hard question — *"is this counterparty safe for 60-day terms?"* — into
+seven small claims, buys the cheapest Telegraph answer that can settle each one, and
+prints a decision where **every sentence is either footnoted or absent**.
 
-One miner's answer is an opinion backed by nobody. Tina's product is the
-**agreement**: it pays every miner separately, stores every receipt, and reports
-where they disagree. Disagreement is the signal a single-model tool cannot give you.
-
-Testnet only. Real money is never involved: the token is the Sepolia test USDC and
-every ask is paid from a Telegraph escrow balance.
+The default is one ask per claim. Extra scouts are bought only where the map is
+contested or a load-bearing claim is unsettled. On a real run that came to **$0.08 for
+eight purchases** — near the price of a single answer, not three times it.
 
 ---
 
-## What it does
+## Why it looks like this
 
-Three workflows, each a different question, each with a numeric verdict:
+Telegraph ranks miners, so the network already gives you a good answer at 1x cost.
+Buying three answers for every request is a tax, not verification.
 
-| Command | Buys | Decision |
-|---|---|---|
-| `tina listing` | liquidity depth, holder count, wash-trading verdict | list / review / reject a token |
-| `tina stablecoin` | spot price, reserve attestation, sanctions screen | peg and counterparty health |
-| `tina yield` | supply APY, protocol TVL | is this yield plausible at this size |
-| `tina mining` | grid power price, Bitcoin hashprice | does this site make money at this power price |
+Verification is worth paying for in exactly one place: where an extra purchase could
+change the decision. So Colony spends the first dollar on **coverage** (one claim at a
+time) and the second only on **the claim the verdict hinges on**.
 
-Each run prints a risk score out of 100 with its reasons, then writes a memo plus
-the raw answers and receipts.
+| Run | Claims | Asks | Paid | Cost |
+|---|---|---|---|---|
+| Maersk, $0.25 budget | 7 | 11 | 8 | **$0.08** |
 
----
+## The loop
 
-## Install
+```
+plan      → seven claims, most load-bearing first, until the budget is committed
+scout     → one claim, one miner, one structured fact, one receipt
+map       → settled / contested / blind / dead, per claim
+escalate  → 2 extra scouts, max 2 claims: only dead load-bearing or contested ones
+verdict   → ALLOW / ALLOW WITH CONDITIONS / HOLD / BLOCK, from the map alone
+memo      → footnotes, a receipt table, and a section listing what could not be verified
+```
+
+The queen reads the map, never a raw answer, so one confident scout cannot decide
+anything on its own.
+
+## What a decision looks like
+
+```
+# A.P. Moller-Maersk A/S
+
+**Verdict: HOLD**  ·  confidence 0/100  ·  spent $0.0800 on 8 purchases
+
+- sanctions could not be checked: no usable answer was bought
+- registry reports the entity as active
+
+## What the swarm bought
+
+- **registry** (single) — legal_name: A.P. MØLLER - MÆRSK A/S; registration_id: 22756214; active: True [1]
+- **sanctions** (dead) — nothing usable came back [2],[10],[11]
+- **fx** (single) — converted_amount: 6,801.2739 [4]
+
+## What we could not verify
+- sanctions: no usable answer was returned, so nothing is asserted about it.
+
+## Receipts
+| # | claim | miner | price | signal |
+|---|-------|-------|-------|--------|
+| 1 | registry | PREFLIGHT Infrastructure Signals | $0.0100 | `0x36502787c0` |
+```
+
+That `HOLD` is the product working: the one claim that matters could not be bought, so
+the answer is *do not proceed*, not a confident guess.
+
+## Quickstart
 
 ```bash
 python3 -m venv .venv
 ./.venv/bin/pip install -r requirements.txt
+
+# a funded test wallet (see docs/USAGE.md)
+./.venv/bin/python -m colony.cli ask "Is this counterparty safe for 60-day terms?" \
+  --company "A.P. Moller-Maersk A/S" --domain maersk.com --budget 0.25 \
+  --bundle runs/maersk.json
 ```
 
-## Fund a test wallet (Sepolia, testnet only)
-
-Tina signs one EIP-191 message per ask, so it needs a key and an escrow balance,
-not a gas-funded wallet.
+Free, no wallet, no spend:
 
 ```bash
-# 1. A wallet. The Telegraph MCP CLI creates one and prints the address.
-npx -y @telegraphprotocol/telegraph-protocol-mcp setup
-
-# 2. Test USDC (the Sepolia test token has an open mint, no faucet queue):
-./.venv/bin/python scripts/fund_testnet.py mint 3
-
-# 3. Deposit into the escrow balance of the node's Diamond, then read it back:
-./.venv/bin/python scripts/fund_testnet.py deposit 2.5
-curl -s https://devnode.telegraphprotocol.com/v1/ledger/account/<your address>
+./.venv/bin/python -m colony.cli claims      # the seven claims and the intents behind them
+./.venv/bin/python -m colony.cli ledger      # what has been bought, with receipts
+./.venv/bin/python -m pytest tests -q        # 87 tests, offline
 ```
 
-`available` in that last response is what asks may spend. The ledger shows a
-deposit immediately; the ask path may not see it until the node's next epoch
-(3 hours), so Tina reports the refusal verbatim instead of pretending it paid.
-
-## Run
+HTTP, if you want to call it from a treasury system:
 
 ```bash
-./.venv/bin/python cli.py quote yield --project aave-v3     # price it, pay nothing
-./.venv/bin/python cli.py yield --project aave-v3 --symbol USDC --chain ethereum
-./.venv/bin/python cli.py stablecoin --symbol USDC --asset USDC --issuer Circle
-./.venv/bin/python cli.py listing --token 0x... --pool 0x... --chain base --size-usd 25000
+./.venv/bin/python -m colony.api --port 8088
+curl -s localhost:8088/ask -H 'content-type: application/json' \
+  -d '{"company":"A.P. Moller-Maersk A/S","budget_usd":0.25}' | jq '.verdict, .budget'
 ```
 
-Every paid run:
+## What it does not do
 
-- prints what each miner charged and whether it answered;
-- refuses an ask over `--max-ask`, a run over `--max-run`, a day over `--max-day`;
-- writes `runs/<workflow>-<timestamp>.json` (all answers, receipts, prices),
-  `runs/<workflow>-<timestamp>.md` (the memo) and a small `.verdict.json`.
+- It does not verify claims it could not buy. They appear under "what we could not verify".
+- It does not average disagreements. Both sides are shown; neither is chosen.
+- It does not run on mainnet, and it makes no claim about production pricing.
+- It does not decide for you. `HOLD` means "a human should look", not "guilty".
 
-Exit codes: `0` pass/review, `2` reject, `3` payment refused, `4` network or
-wallet error. A reject is a successful run.
+## Mission
 
-## Every command
+**Season II, Mission 03 — Institutional Markets.** The customer is a treasury or credit
+team deciding whether to extend terms to a counterparty; the outcome is a decision they
+can attach to a credit file, with the receipts behind it.
 
-| Command | Costs money? | What it does |
-|---|---|---|
-| `tina listing` | yes | token listing risk (3 intents) |
-| `tina stablecoin` | yes | peg, reserve and sanctions check (3 intents) |
-| `tina mining` | yes | mining margin against a grid price (2 intents) |
-| `tina yield` | yes | APY plausibility against TVL (2 intents) |
-| `tina quote <workflow>` | no | fetch the payment challenge and print the projected cost |
-| `tina health <intent or workflow>` | no | ranked miners, prices, answer fields |
-| `tina miners <intent>` | no | ranked miners for one intent, with prices |
-| `tina signal <hash>` | no | resolve a paid answer's delivery record |
-| `tina spend` | no | what the caps have been charged, per day |
-| `tina replay <run.json>` | no | re-render a memo from saved evidence |
-| `tina account` | no | wallet address and an escrow quote |
-| `tina intents [--search]` | no | the intent catalogue this node serves |
-
-## Docs
-
-- [`docs/USAGE.md`](docs/USAGE.md) - real transcripts, exit codes
-- [`docs/MISSIONS.md`](docs/MISSIONS.md) - how each workflow meets its mission
-- [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) - every error these runs hit
-- [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) - how to add a workflow
-- [`docs/TUTORIAL.md`](docs/TUTORIAL.md) - build this yourself in thirty minutes
-
-## Evidence a reviewer can check
-
-```
-runs/yield-20261119T093012Z.md             memo: verdict, reasons, cost, receipts
-runs/yield-20261119T093012Z.json           every ask: miner id, params, result, receipt
-runs/yield-20261119T093012Z.verdict.json   the decision alone
-```
-
-Each ask in the JSON carries its `result`, the `price_usd` actually charged and the
-node's `X-PAYMENT-RESPONSE` receipt, so every claim in the memo traces to a paid
-call. `~/.tina/spend.json` holds the per-UTC-day spend the caps enforce.
-
-`evidence/` in this repo holds three real runs committed as they were produced:
-one per workflow, with their receipts and signal hashes. Nothing in them was
-edited after the run.
-
-## Cost per outcome
-
-One ask costs $0.01 on this node. A workflow buys 2-3 intents across 2-3 miners:
-
-- `yield`: 2 intents x 3 miners = 6 asks = **$0.06** per decision
-- `stablecoin`: 3 intents x 2-3 miners = **$0.06-$0.09**
-- `listing`: 3 intents x 2-3 miners = **$0.08-$0.10**
-- `mining`: 2 intents x 3 miners = **$0.06** per site decision
-
-A failed ask is never billed, so the printed cost is what the node charged.
-
-## Failure handling
-
-- **A miner fails:** the answer is recorded as failed, the workflow continues, and
-  the memo lists the gap. Two good answers are still a result; one is not, and the
-  memo says so.
-- **Escrow refuses:** the run stops before spending anything else and prints the
-  node's exact reason.
-- **Miners disagree:** disagreement adds risk instead of being averaged away.
-- **Nothing answers:** the verdict cannot be PASS. Missing data is never good news.
-
-## What Tina does not do
-
-- It does not claim settlement. It reports the receipt the node returned.
-- It does not treat agreement as truth. Several miners can share one bad source;
-  agreement measures consistency, not correctness.
-- It does not run on mainnet and makes no claim about production pricing.
-- It does not hide the escrow indexing delay: every run that hit it says so, in the
-  evidence, with the node's own error text.
-
-## Evaluation material
-
-`truth/` holds the truth sources Tina's own workflows depend on, uploaded to the
-evaluation pool instead of kept private:
-
-- `truth-coinbase-spot.yaml` - `CRYPTO_PRICE_USD` from Coinbase's keyless rates API
-- `truth-frankfurter-ecb.yaml` - `CURRENCY_EXCHANGE_CONVERT` from ECB reference rates
-
-```bash
-./.venv/bin/python truth/upload_truth_source.py truth/truth-coinbase-spot.yaml CRYPTO_PRICE_USD
-```
-
-## Tests
-
-```bash
-./.venv/bin/python -m pytest tests -q
-```
-
-45 tests, no network, no wallet, no spend: scoring thresholds, agreement counting,
-the mining arithmetic, zone matching against a mis-priced market, memo contents, and the
-failure paths where a miner dies mid-run or answers without the field that was asked for.
+Evaluation material for the same intents lives in `truth/` and `evidence/`.
 
 ## Layout
 
 ```
-cli.py                   argument parsing and exit codes
-core/client.py           node client: escrow payment, caps, receipts
-core/flows.py            the three workflows and their pure scoring rules
-core/report.py           run evidence and memos
-core/wallet.py           key loading, never logged
-scripts/fund_testnet.py  test USDC mint and escrow deposit
-truth/                   truth sources, and the signed uploader
-tests/                   unit tests
+colony/intents.py    the seven claims and how each maps to an intent
+colony/scouts.py     one claim, one ask, one fact
+colony/cluster.py    agreement, disagreement, blindness
+colony/allocator.py  coverage first, escalation where it pays
+colony/queen.py      the loop and the verdict rules
+colony/memo.py       the footnoted document and the signed bundle
+colony/ledger.py     append-only purchases
+colony/policy.py     budget and caps
+colony/cli.py        ask, watch, ledger, claims
+colony/api.py        POST /ask
+demo/index.html      one-page demo
+evidence/            real runs, probes, receipts
+truth/               evaluation material contributed back to the pool
 ```
 
-## What the network did in these runs (19 Nov 2026, devnode)
-
-Recorded from the committed evidence, not editorialised:
-
-- **Escrow rail works.** 20 paid asks across the three runs settled from escrow, each
-  with a `receipt_hash` and a `signal_hash` in the run JSON.
-- **A fresh deposit is invisible to `/engine/v1/ask` for a while.** After funding,
-  `/v1/ledger/account` shows the balance immediately but asks return
-  `insufficient escrow for delivery: ... balance=0`; it clears once the node's
-  indexer catches up. Tina surfaces that refusal verbatim.
-- **`CRYPTO_YIELD_RATE_GENERAL` is thinly supplied.** Of 5 miners asked, 1 returned
-  `supply_apy`; two others answered with unrelated payloads. The yield workflow
-  therefore returns REVIEW, not PASS: one reading is not corroboration.
-- **Two miners return upstream bodies over the 8 MiB limit** (`TVL_LOOKUP_GENERAL`
-  and `ASSET_RESERVE_ATTESTATION_GENERAL`), which the node reports as a 500 after
-  payment. They were not billed.
-- **One miner answers a judgment intent with a 400** (`SANCTIONS_SCREENING_MATCH`:
-  `Missing 'prompt' field`), so that intent had a single source in the run.
-
-## Missions
-
-- **01 Exchange** - `tina listing`
-- **02 Stablecoin** - `tina stablecoin`
-- **12 Mining & Power** - `tina mining`
-- **13 Asset Management** - `tina yield`
-
-MIT. See [LICENSE](LICENSE).
+MIT. See [docs/PRODUCT.md](docs/PRODUCT.md) for the customer and the cut list, and
+[docs/DECISIONS.md](docs/DECISIONS.md) for why v2 was thrown away.
