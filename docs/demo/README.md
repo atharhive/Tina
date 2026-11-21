@@ -1,6 +1,6 @@
 # Demo
 
-`colony-demo.mp4` — 2:48, 1280x720, narrated (en-GB, Thomas).
+`colony-demo.mp4` — 2:48, 1280x720, narrated by Brian (en-US, multilingual).
 
 ## How it was made
 
