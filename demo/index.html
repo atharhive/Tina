@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Colony — a swarm that prices a question</title>
+<style>
+  :root { --bg:#0b0d12; --panel:#12151d; --line:#232734; --fg:#e6e9ef; --dim:#8b93a7; --accent:#7cc4ff; --good:#7ed69b; --warn:#f0be6e; --bad:#ee8282; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+  header { padding:28px 24px 10px; border-bottom:1px solid var(--line); }
+  h1 { margin:0 0 6px; font-size:22px; letter-spacing:-0.2px; }
+  header p { margin:0; color:var(--dim); }
+  main { display:grid; grid-template-columns: 360px 1fr; gap:18px; padding:18px 24px 60px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  label { display:block; font-size:12px; color:var(--dim); margin:10px 0 4px; text-transform:uppercase; letter-spacing:.06em; }
+  input { width:100%; padding:9px 10px; border-radius:8px; border:1px solid var(--line); background:#0e1118; color:var(--fg); font:inherit; }
+  button { margin-top:14px; width:100%; padding:10px 12px; border-radius:8px; border:0; background:var(--accent); color:#06121e; font-weight:650; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:default; }
+  pre { margin:0; white-space:pre-wrap; font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace; }
+  .verdict { font-size:18px; font-weight:700; margin-bottom:8px; }
+  .meta { color:var(--dim); font-size:13px; margin-bottom:12px; }
+  .ok { color:var(--good); } .warn { color:var(--warn); } .bad { color:var(--bad); }
+  .hint { color:var(--dim); font-size:12px; margin-top:12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Colony</h1>
+  <p>Give it a question and a budget. It buys the cheapest claim that settles each part, and shows you where it is still blind.</p>
+</header>
+<main>
+  <section class="card">
+    <label for="company">Counterparty</label>
+    <input id="company" value="A.P. Moller-Maersk A/S" />
+    <label for="jurisdiction">Jurisdiction</label>
+    <input id="jurisdiction" value="Denmark" />
+    <label for="domain">Domain</label>
+    <input id="domain" value="maersk.com" />
+    <label for="budget">Budget (USD)</label>
+    <input id="budget" value="0.25" />
+    <button id="go">Buy a decision</button>
+    <p class="hint">Runs against the Telegraph testnet. Every purchase is receipted; the ledger is append-only.</p>
+  </section>
+  <section class="card">
+    <div id="summary" class="meta">No decision yet.</div>
+    <pre id="memo"></pre>
+  </section>
+</main>
+<script>
+const go = document.getElementById('go');
+go.addEventListener('click', async () => {
+  const body = {
+    company: document.getElementById('company').value,
+    jurisdiction: document.getElementById('jurisdiction').value,
+    domain: document.getElementById('domain').value,
+    budget_usd: parseFloat(document.getElementById('budget').value || '0.25')
+  };
+  go.disabled = true; go.textContent = 'Scouts out…';
+  document.getElementById('summary').textContent = 'Buying claims, cheapest first…';
+  try {
+    const res = await fetch('/ask', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || res.status);
+    const v = data.verdict || {};
+    const cls = (v.verdict || '').startsWith('BLOCK') ? 'bad' : (v.verdict || '').startsWith('ALLOW') ? 'ok' : 'warn';
+    document.getElementById('summary').innerHTML =
+      `<span class="verdict ${cls}">${v.verdict}</span> · confidence ${v.confidence}/100 · $${data.budget.spent_usd.toFixed(4)} on ${data.budget.purchases} purchases · bundle ${data.bundle_sha256.slice(0,12)}`;
+    document.getElementById('memo').textContent = data.memo;
+  } catch (err) {
+    document.getElementById('summary').textContent = 'Failed: ' + err.message;
+  } finally {
+    go.disabled = false; go.textContent = 'Buy a decision';
+  }
+});
+</script>
+</body>
+</html>
