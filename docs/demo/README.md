@@ -1,35 +1,54 @@
 # Demo
 
-`colony-demo.mp4` — 2:48, 1280x720, narrated by Brian (en-US, multilingual).
+`colony-demo.mp4` — 2:52, 1280x720, narrated by Brian (en-US, multilingual).
 
-## How it was made
+## This one is the real thing
 
-It is a **reconstruction, not a screen recording.** Every terminal frame is rendered
-from the committed run in `evidence/colony-maersk-20261121.json` and the memo it
-produced. The numbers, the miner names, the verdict and the cost are the run's, not
-plausible-looking placeholders. Nothing is a live capture, and the video does not claim
-to be one.
+The terminal footage is a **live session recorded in a PTY**, not a mockup and not a
+reconstruction. The commands ran against the devnode, the payments settled from escrow,
+and the receipts in the video are the receipts in `evidence/`. The pauses where a miner
+took six seconds to answer are real pauses; each scene is only sped up or slowed so it
+lines up with its narration.
 
-If you would rather watch a live session, `docs/USAGE.md` has the exact commands, and the
-whole run costs about eight cents on testnet.
+The two browser shots are live pages: `telegraphprotocol.com` and
+`github.com/atharhive/colony`.
 
 ## What it shows
 
-1. The decision a credit team actually makes, and the file it never produces.
-2. The seven claims, and which two are load-bearing.
-3. One ask per claim, escalation only where the answer changes: 11 asks, 8 paid, $0.08.
-4. The memo, including the section most tools would leave out.
-5. `verify_bundle.py` saying VERIFIED, and what happens when one fact is edited.
-6. The cost ladder, and the cap that prevents a quiet 21-ask run.
+1. What Telegraph is: a vending machine for facts, where each answer costs a penny and
+   comes with a receipt.
+2. The problem: decide today whether to give a counterparty 60-day terms.
+3. The seven claims, two of them load-bearing.
+4. The live run: nine paid asks, two failed registry attempts that cost nothing, and two
+   extra sanctions scouts because one opinion was not enough.
+5. The memo: ALLOW WITH CONDITIONS, 50/100 confidence, $0.09, and an explicit section on
+   what could not be verified.
+6. `verify_bundle.py` saying VERIFIED, then catching a single edited fact.
+7. 54 tests with no network, then the purchase ledger.
+8. Where to check: the repository, and the evidence folder inside it.
 
-## Transcript
+## Reproducing it
 
-The narration text lives in the build script's `SCENES` list, which is kept outside the
-repository because it is a render tool, not part of the product. The scenes map 1:1 to
-the sections above.
+```
+git clone https://github.com/atharhive/colony && cd colony
+python3 -m venv .venv && ./.venv/bin/pip install -r requirements.txt
+./.venv/bin/python -m colony ask "Is this counterparty safe for 60-day payment terms?" \
+  --company "A.P. Moller-Maersk A/S" --domain maersk.com --budget 0.25 \
+  --bundle runs/demo.json --live
+./.venv/bin/python scripts/verify_bundle.py runs/demo.json
+```
+
+Costs about nine cents of testnet USDC. `--live` prints each purchase as it lands, which
+is the view used in the video.
+
+## The taping
+
+One take, one session, default budget. The video stays honest about the awkward parts:
+two registry miners failed, confidence is 50 rather than 100, and the memo says why.
 
 ## Rebuilding it
 
-The renderer needs Pillow, edge-tts and ffmpeg, and rebuilds the whole video in about
-five minutes. It is intentionally not part of the package: nothing in `colony/` depends
-on it.
+The recorder (`pty` capture with timings) and the renderer (Pillow + edge-tts + ffmpeg)
+live outside the package, because nothing in `colony/` depends on them. The capture file
+is a JSONL of timestamped chunks, so the same session can be re-cut without re-buying
+anything.
