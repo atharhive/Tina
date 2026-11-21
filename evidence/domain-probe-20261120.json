@@ -1,0 +1,395 @@
+{
+ "company": "A.P. Moller-Maersk A/S",
+ "intents": [
+  {
+   "intent": "CORPORATE_REGISTRY_LOOKUP_GENERAL",
+   "params": {
+    "company": "A.P. Moller-Maersk A/S",
+    "jurisdiction": "Denmark"
+   },
+   "asked": 3,
+   "answered": 1,
+   "fields": {
+    "legal_name": [
+     "A.P. M\u00d8LLER - M\u00c6RSK A/S"
+    ],
+    "registration_id": [
+     "22756214"
+    ],
+    "active": [
+     true
+    ],
+    "jurisdiction": [
+     "DK"
+    ],
+    "registered_address": [
+     "Esplanaden 50, Kobenhavn K, DK-84, 1263, DK"
+    ],
+    "incorporated": [
+     "1904-04-16"
+    ]
+   },
+   "samples": [
+    {
+     "miner": "a1-preflight",
+     "ok": true,
+     "price_usd": 0.01,
+     "result": {
+      "legal_name": "A.P. M\u00d8LLER - M\u00c6RSK A/S",
+      "registration_id": "22756214",
+      "active": true,
+      "jurisdiction": "DK",
+      "registered_address": "Esplanaden 50, Kobenhavn K, DK-84, 1263, DK",
+      "incorporated": "1904-04-16"
+     },
+     "signal": "0x06b55ac1eee1fd064682a0b4ef995a65c27ff365a17634ae0fc82cddac75ca4b"
+    },
+    {
+     "miner": "breadwinner-price",
+     "ok": false,
+     "error": "HTTP 500 after payment: miner error 404 [company_not_found]: no entity named exactly \"A.P. Moller-Maersk A/S\" is registered in DK. Similar registered names: A.P"
+    },
+    {
+     "miner": "corp-gleif",
+     "ok": false,
+     "error": "HTTP 503 from /engine/v1/ask/98001: {\"error\":\"no_compatible_miner\",\"intent\":\"CORPORATE_REGISTRY_LOOKUP_GENERAL\",\"message\":\"no request built for a miner serving "
+    }
+   ]
+  },
+  {
+   "intent": "B2B_IDENTITY_ENRICHMENT_GENERAL",
+   "params": {
+    "company": "maersk.com"
+   },
+   "asked": 2,
+   "answered": 2,
+   "fields": {
+    "company": [
+     "maersk.com",
+     null
+    ],
+    "domain": [
+     "maersk.com",
+     "maersk.com"
+    ],
+    "employee_count": [
+     null,
+     null
+    ],
+    "industry": [
+     null,
+     null
+    ],
+    "headquarters": [
+     null,
+     null
+    ]
+   },
+   "samples": [
+    {
+     "miner": "b2b-brandfetch",
+     "ok": true,
+     "price_usd": 0.01,
+     "result": {
+      "company": "maersk.com",
+      "domain": "maersk.com",
+      "employee_count": null,
+      "industry": null,
+      "headquarters": null
+     },
+     "signal": "0x2454450a66e61ac9463dd5670a6b17ff72433adda62547b9904110b51472ee94"
+    },
+    {
+     "miner": "datawire-b2b-identity-enrichment",
+     "ok": true,
+     "price_usd": 0.01,
+     "result": {
+      "company": null,
+      "domain": "maersk.com",
+      "employee_count": null,
+      "industry": null,
+      "headquarters": null
+     },
+     "signal": "0xd32e5752e683b1aa62091cdd9f66b94db360f9cbcdc55ad544f6d8dfae2561e0"
+    }
+   ]
+  },
+  {
+   "intent": "REGULATORY_FILING_MONITOR_GENERAL",
+   "params": {
+    "entity": "A.P. Moller-Maersk A/S",
+    "period": "last 12 months"
+   },
+   "asked": 3,
+   "answered": 2,
+   "fields": {
+    "entity": [
+     "A.P. Moller-Maersk A/S",
+     null
+    ],
+    "filing_count": [
+     0,
+     3
+    ],
+    "filings": [
+     null,
+     [
+      "Ocean Common Carrier and Marine Terminal Operator Agreements Subject to the Shipping Act of 1984; Final Rule",
+      "Ocean Common Carrier and Marine Terminal Operator Agreements Subject to the Shipping Act of 1984",
+      "Port Restrictions and Requirements in the United States/Japan Trade"
+     ]
+    ],
+    "urls": [
+     null,
+     [
+      "https://www.federalregister.gov/documents/2004/11/04/04-24438/ocean-common-carrier-and-marine-terminal-operator-agreements-subject-to-the-shipping-act-of-1984",
+      "https://www.federalregister.gov/documents/2003/12/02/03-29738/ocean-common-carrier-and-marine-terminal-operator-agreements-subject-to-the-shipping-act-of-1984",
+      "https://www.federalregister.gov/documents/2001/08/15/01-20554/port-restrictions-and-requirements-in-the-united-statesjapan-trade"
+     ]
+    ]
+   },
+   "samples": [
+    {
+     "miner": "a1-preflight",
+     "ok": true,
+     "price_usd": 0.01,
+     "result": {
+      "entity": "A.P. Moller-Maersk A/S",
+      "filing_count": 0,
+      "filings": null,
+      "urls": null
+     },
+     "signal": "0xe563d076b3a3b9b57b6e75c82a7d2440a52d4302c64040f5190d8d0a6e56c563"
+    },
+    {
+     "miner": "counterproof-filing-monitor",
+     "ok": false,
+     "error": "HTTP 500 after payment: upstream call failed: status 502: {\"error\":{\"code\":\"UPSTREAM\",\"message\":\"SEC EDGAR could not be read; retry shortly\"}}"
+    },
+    {
+     "miner": "txlens",
+     "ok": true,
+     "price_usd": 0.01,
+     "result": {
+      "entity": null,
+      "filing_count": 3,
+      "filings": [
+       "Ocean Common Carrier and Marine Terminal Operator Agreements Subject to the Shipping Act of 1984; Final Rule",
+       "Ocean Common Carrier and Marine Terminal Operator Agreements Subject to the Shipping Act of 1984",
+       "Port Restrictions and Requirements in the United States/Japan Trade"
+      ],
+      "urls": [
+       "https://www.federalregister.gov/documents/2004/11/04/04-24438/ocean-common-carrier-and-marine-terminal-operator-agreements-subject-to-the-shipping-act-of-1984",
+       "https://www.federalregister.gov/documents/2003/12/02/03-29738/ocean-common-carrier-and-marine-terminal-operator-agreements-subject-to-the-shipping-act-of-1984",
+       "https://www.federalregister.gov/documents/2001/08/15/01-20554/port-restrictions-and-requirements-in-the-united-statesjapan-trade"
+      ]
+     },
+     "signal": "0xd6417dff38db165bc0e9f3d42890857c58318058498fa182fb0c7a31f02107b0"
+    }
+   ]
+  },
+  {
+   "intent": "SANCTIONS_SCREENING_MATCH_GENERAL",
+   "params": {
+    "name": "A.P. Moller-Maersk A/S"
+   },
+   "asked": 2,
+   "answered": 1,
+   "fields": {
+    "name": [
+     "A.P. Moller-Maersk A/S"
+    ],
+    "matched": [
+     false
+    ],
+    "matches": [
+     null
+    ],
+    "lists": [
+     [
+      "OFAC SDN",
+      "OFAC Consolidated (non-SDN)",
+      "UK Sanctions List (entities only)",
+      "Canada autonomous sanctions (entities only)",
+      "EU Financial Sanctions (entities only)",
+      "US BIS Entity List (export controls)",
+      "US BIS Military End User List (export controls)",
+      "US BIS Denied Persons List (dated standard export-denial orders)",
+      "UK Sanctions List (ships)",
+      "US BIS Entity List (additional primary-row corroborated records)",
+      "Canada autonomous sanctions (November 5 additional entities)",
+      "Canada autonomous sanctions (corroborated ships)",
+      "Canada autonomous sanctions (November 5 Iranian entity amendment)"
+     ]
+    ],
+    "match_score": [
+     0
+    ]
+   },
+   "samples": [
+    {
+     "miner": "kimutai-sanctions-screener",
+     "ok": false,
+     "error": "HTTP 500 after payment: upstream error 400: {\"detail\":\"Missing 'prompt' field in request body.\"}"
+    },
+    {
+     "miner": "zk-sanctions",
+     "ok": true,
+     "price_usd": 0.01,
+     "result": {
+      "name": "A.P. Moller-Maersk A/S",
+      "matched": false,
+      "matches": null,
+      "lists": [
+       "OFAC SDN",
+       "OFAC Consolidated (non-SDN)",
+       "UK Sanctions List (entities only)",
+       "Canada autonomous sanctions (entities only)",
+       "EU Financial Sanctions (entities only)",
+       "US BIS Entity List (export controls)",
+       "US BIS Military End User List (export controls)",
+       "US BIS Denied Persons List (dated standard export-denial orders)",
+       "UK Sanctions List (ships)",
+       "US BIS Entity List (additional primary-row corroborated records)",
+       "Canada autonomous sanctions (November 5 additional entities)",
+       "Canada autonomous sanctions (corroborated ships)",
+       "Canada autonomous sanctions (November 5 Iranian entity amendment)"
+      ],
+      "match_score": 0
+     },
+     "signal": "0x38c9e244c3b7340e33a1eb0174c1601c5dea2a919c7764c67f39339cb3d6e0b2"
+    }
+   ]
+  },
+  {
+   "intent": "MACRO_ECONOMIC_INDICATOR_GENERAL",
+   "params": {
+    "indicator": "unemployment rate",
+    "country": "Denmark",
+    "year": 2025
+   },
+   "asked": 2,
+   "answered": 1,
+   "fields": {
+    "rate_pct": [
+     5.529
+    ]
+   },
+   "samples": [
+    {
+     "miner": "datawire-macro-economic-indicator",
+     "ok": true,
+     "price_usd": 0.01,
+     "result": {
+      "rate_pct": 5.529
+     },
+     "signal": "0xbf77815e86541f0db024eb455a41a133047760455754380c7282d4774465e35f"
+    },
+    {
+     "miner": "macro-wb-unemp-proxy",
+     "ok": false,
+     "error": "HTTP 503 from /engine/v1/ask/91006: {\"error\":\"no_compatible_miner\",\"intent\":\"MACRO_ECONOMIC_INDICATOR_GENERAL\",\"message\":\"no request built for a miner serving M"
+    }
+   ]
+  },
+  {
+   "intent": "NEWS_SEARCH_GENERAL",
+   "params": {
+    "query": "A.P. Moller-Maersk A/S sanctions investigation"
+   },
+   "asked": 2,
+   "answered": 2,
+   "fields": {
+    "answer": [
+     "Recent coverage of A.P. Moller-Maersk A/S sanctions investigation from the last 30 days includes: \"A.P. Moller-Maersk (OTCMKTS:AMKBY) Cut to \u201cStrong Sell\u201d at Barclays\" (defenseworld.net, 13 November 2026); \"Maersk Reports IT Security Incident Involving Unauthorized Data Access\" (poisar.com, 11 November 2026); \"Shipping giant Maersk probes 'IT security incident,' data theft\" (baudrate.tw, 11 November 2026); \"Shipping Giant Maersk Confirms Data Breach Following Unauthorized Access to IT Systems - IT Security News\" (itsecuritynews.info, 12 November 2026).",
+     "No dated matching reports for \"A.P. Moller-Maersk A/S sanctions investigation\" were found in the checked sources."
+    ],
+    "result_count": [
+     4,
+     0
+    ],
+    "sources": [
+     [
+      "defenseworld.net",
+      "poisar.com",
+      "baudrate.tw",
+      "itsecuritynews.info"
+     ],
+     null
+    ],
+    "brief": [
+     "Recent coverage of A.P. Moller-Maersk A/S sanctions investigation from the last 30 days includes: \"A.P. Moller-Maersk (OTCMKTS:AMKBY) Cut to \u201cStrong Sell\u201d at Barclays\" (defenseworld.net, 13 November 2026); \"Maersk Reports IT Security Incident Involving Unauthorized Data Access\" (poisar.com, 11 November 2026); \"Shipping giant Maersk probes 'IT security incident,' data theft\" (baudrate.tw, 11 November 2026); \"Shipping Giant Maersk Confirms Data Breach Following Unauthorized Access to IT Systems - IT Security News\" (itsecuritynews.info, 12 November 2026).",
+     "No dated matching reports were found in the checked sources."
+    ]
+   },
+   "samples": [
+    {
+     "miner": "chainsight-oracle",
+     "ok": true,
+     "price_usd": 0.01,
+     "result": {
+      "answer": "Recent coverage of A.P. Moller-Maersk A/S sanctions investigation from the last 30 days includes: \"A.P. Moller-Maersk (OTCMKTS:AMKBY) Cut to \u201cStrong Sell\u201d at Barclays\" (defenseworld.net, 13 November 2026); \"Maersk Reports IT Security Incident Involving Unauthorized Data Access\" (poisar.com, 11 November 2026); \"Shipping giant Maersk probes 'IT security incident,' data theft\" (baudrate.tw, 11 November 2026); \"Shipping Giant Maersk Confirms Data Breach Following Unauthorized Access to IT Systems - IT Security News\" (itsecuritynews.info, 12 November 2026).",
+      "result_count": 4,
+      "sources": [
+       "defenseworld.net",
+       "poisar.com",
+       "baudrate.tw",
+       "itsecuritynews.info"
+      ],
+      "brief": "Recent coverage of A.P. Moller-Maersk A/S sanctions investigation from the last 30 days includes: \"A.P. Moller-Maersk (OTCMKTS:AMKBY) Cut to \u201cStrong Sell\u201d at Barclays\" (defenseworld.net, 13 November 2026); \"Maersk Reports IT Security Incident Involving Unauthorized Data Access\" (poisar.com, 11 November 2026); \"Shipping giant Maersk probes 'IT security incident,' data theft\" (baudrate.tw, 11 November 2026); \"Shipping Giant Maersk Confirms Data Breach Following Unauthorized Access to IT Systems - IT Security News\" (itsecuritynews.info, 12 November 2026)."
+     },
+     "signal": "0x11f34a7020a4409d8cfa09dbc15637eba688b3cb223519e140e43e3502d4c4be"
+    },
+    {
+     "miner": "zk-newsbudget",
+     "ok": true,
+     "price_usd": 0.01,
+     "result": {
+      "answer": "No dated matching reports for \"A.P. Moller-Maersk A/S sanctions investigation\" were found in the checked sources.",
+      "result_count": 0,
+      "sources": null,
+      "brief": "No dated matching reports were found in the checked sources."
+     },
+     "signal": "0x32cf05c88ed5e451a06ac84fc2e24b325103dc6b91fd9342f23d5c73b7ebcec7"
+    }
+   ]
+  },
+  {
+   "intent": "CURRENCY_EXCHANGE_CONVERT",
+   "params": {
+    "from_currency": "USD",
+    "to_currency": "DKK",
+    "amount": 1000
+   },
+   "asked": 2,
+   "answered": 2,
+   "fields": {
+    "converted_amount": [
+     6801.273885350319,
+     6801.273885350319
+    ]
+   },
+   "samples": [
+    {
+     "miner": "finwire-currency-exchange",
+     "ok": true,
+     "price_usd": 0.01,
+     "result": {
+      "converted_amount": 6801.273885350319
+     },
+     "signal": "0xa341f1c02614c2b3dbc9b778578154484005a3fa162b070254f15cdb7d6bed9e"
+    },
+    {
+     "miner": "livecert",
+     "ok": true,
+     "price_usd": 0.01,
+     "result": {
+      "converted_amount": 6801.273885350319
+     },
+     "signal": "0x65d63bf1026c750adb11facaeb8db09e692bc44f8978f90bfabd2fe76976da13"
+    }
+   ]
+  }
+ ],
+ "spent_usd": 0.11
+}

@@ -1,0 +1,16 @@
+{
+ "company": "A.P. Moller-Maersk A/S",
+ "spent_usd": 0.11,
+ "asks": 16,
+ "answered": 11,
+ "per_intent": {
+  "CORPORATE_REGISTRY_LOOKUP_GENERAL": "1/3 answered, CVR 22756214 returned",
+  "B2B_IDENTITY_ENRICHMENT_GENERAL": "2/2 answered but every field empty",
+  "REGULATORY_FILING_MONITOR_GENERAL": "2/3, sources disagreed 0 vs 3 filings",
+  "SANCTIONS_SCREENING_MATCH_GENERAL": "1/2, no match",
+  "MACRO_ECONOMIC_INDICATOR_GENERAL": "1/2, 5.529%",
+  "NEWS_SEARCH_GENERAL": "2/2, disagreed 4 sources vs 0",
+  "CURRENCY_EXCHANGE_CONVERT": "2/2, identical"
+ },
+ "conclusion": "Corporate registry, sanctions, macro and FX are answerable. Identity enrichment returns empty fields. Filings and news disagree between sources, which is the product, not a defect."
+}
