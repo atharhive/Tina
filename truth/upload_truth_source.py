@@ -55,7 +55,7 @@ def upload(node: str, intent: str, body: bytes, key: str) -> dict:
             "Content-Type": "application/x-ndjson",
             "X-Evalpool-Signature": sig_hex,
             "X-Evalpool-Nonce": nonce,
-            "User-Agent": "tina-uploader/2.0",
+            "User-Agent": "colony-uploader/3.0",
         },
         method="POST",
     )
@@ -68,7 +68,7 @@ def upload(node: str, intent: str, body: bytes, key: str) -> dict:
 
 def mine(node: str, intent: str, address: str) -> dict:
     url = f"{node}/api/evalpool/submissions/mine?submitter={address}&intent_id={intent}"
-    req = urllib.request.Request(url, headers={"User-Agent": "tina-uploader/2.0"})
+    req = urllib.request.Request(url, headers={"User-Agent": "colony-uploader/3.0"})
     with urllib.request.urlopen(req, timeout=60) as resp:
         return json.loads(resp.read())
 
