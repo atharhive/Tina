@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
 from pathlib import Path
 
 from colony import __version__
@@ -37,6 +38,21 @@ def _client(args) -> TelegraphClient:
     )
 
 
+def _live_observer():
+    """Print each purchase as it lands, so a run can be watched instead of awaited."""
+    started = time.time()
+    count = [0]
+
+    def observer(fact) -> None:
+        count[0] += 1
+        price = f"${fact.price_usd:.2f}" if fact.price_usd else "free"
+        state = "ok" if fact.ok else ("empty" if fact.ok else "FAIL")
+        miner = (fact.miner or "routed")[:24]
+        print(f"  [{count[0]:02d}] {fact.claim_id:<9} {miner:<24} {price:<5} {state:<5} {time.time() - started:5.1f}s", flush=True)
+
+    return observer
+
+
 def cmd_ask(args) -> int:
     client = _client(args)
     inputs = Inputs(
@@ -49,7 +65,13 @@ def cmd_ask(args) -> int:
     budget = Budget(total_usd=args.budget, max_per_ask=args.max_ask)
     ledger = Ledger(path=None if args.no_ledger else Path(args.ledger))
 
-    answer = run(client, args.question, inputs, budget, ledger=ledger, escalate=not args.no_escalate)
+    if args.live:
+        print("scouts out")
+    answer = run(
+        client, args.question, inputs, budget, ledger=ledger,
+        escalate=not args.no_escalate,
+        observer=_live_observer() if args.live else None,
+    )
 
     print()
     print(render(answer))
@@ -129,6 +151,7 @@ def build_parser() -> argparse.ArgumentParser:
     ask.add_argument("--budget", type=float, default=0.25)
     ask.add_argument("--bundle", default=None, help="write the signed bundle here")
     ask.add_argument("--no-escalate", action="store_true")
+    ask.add_argument("--live", action="store_true", help="print each purchase as it lands")
     ask.add_argument("--no-ledger", action="store_true")
     ask.set_defaults(func=cmd_ask)
 

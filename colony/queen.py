@@ -133,8 +133,13 @@ def run(
     ledger: Ledger | None = None,
     claims: tuple[Claim, ...] = CLAIMS,
     escalate: bool = True,
+    observer=None,
 ) -> Answer:
-    """The whole loop: coverage, map, escalation, verdict."""
+    """The whole loop: coverage, map, escalation, verdict.
+
+    `observer` is called with every fact as it lands, so a caller can watch the swarm
+    work instead of waiting for the memo. It never changes what is bought.
+    """
     ledger = ledger or Ledger()
     answer = Answer(question=question, inputs=inputs, clusters={}, budget=budget, ledger=ledger)
 
@@ -144,6 +149,8 @@ def run(
             answer.clusters.setdefault(assignment.claim.id, Cluster(claim_id=assignment.claim.id)).facts.append(fact)
             if fact.price_usd:
                 _charge(budget, fact.price_usd)
+            if observer:
+                observer(fact)
 
     if escalate:
         for assignment in escalation_plan(contested(answer.clusters), answer.clusters, budget):
@@ -161,6 +168,8 @@ def run(
                 answer.clusters[assignment.claim.id].facts.append(fact)
                 if fact.price_usd:
                     _charge(budget, fact.price_usd)
+                if observer:
+                    observer(fact)
             answer.escalations.append(assignment)
 
     answer.verdict = judge(answer.clusters, claims)
