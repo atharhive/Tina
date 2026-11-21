@@ -58,59 +58,63 @@ class Fact:
         }
 
 
+def _failed(claim: Claim, params: dict[str, Any], target: dict[str, Any] | None, error: str) -> Fact:
+    """A failed ask: kept in the record, never billed, never counted as an answer."""
+    return Fact(
+        claim_id=claim.id,
+        intent=claim.intent,
+        params=params,
+        miner=(target or {}).get("slug", "routed"),
+        miner_id=str((target or {}).get("id", "")),
+        ok=False,
+        error=error,
+    )
+
+
 def scout(
     client: TelegraphClient,
     claim: Claim,
     inputs: Inputs,
     miner_id: str | None = None,
     miners: int = 1,
+    retries: int = 2,
 ) -> list[Fact]:
-    """Run one claim against one miner (or the node's routed choice)."""
+    """Ask one claim until a miner answers, or the candidates run out.
+
+    A hard failure is a provider problem, not a money problem: the failed ask is not
+    billed, so moving to the next ranked miner costs nothing and is the difference
+    between a blind claim and an answered one. A refused payment stops the claim
+    immediately, because that problem does not improve by asking somebody else.
+    """
     params = claim.build(inputs)
-    targets: list[dict[str, Any] | None]
+    candidates: list[dict[str, Any] | None]
     if miner_id:
-        targets = [{"id": miner_id, "slug": f"miner-{miner_id}"}]
+        candidates = [{"id": miner_id, "slug": f"miner-{miner_id}"}]
     elif miners <= 0:
-        targets = [None]
+        candidates = [None]
     else:
         try:
-            pool: list[dict[str, Any] | None] = list(client.miners_for(claim.intent, limit=miners))
+            pool: list[dict[str, Any] | None] = list(client.miners_for(claim.intent, limit=miners + retries))
         except TelegraphError:
             pool = []
-        targets = pool or [None]
+        candidates = pool or [None]
 
     facts: list[Fact] = []
-    for target in targets:
+    answered = 0
+    for target in candidates:
+        if answered >= miners:
+            break
         try:
             result = client.ask(claim.intent, params, miner_id=(target or {}).get("id"))
         except PaymentRefused as exc:
-            facts.append(
-                Fact(
-                    claim_id=claim.id,
-                    intent=claim.intent,
-                    params=params,
-                    miner=target.get("slug", "routed") if target else "routed",
-                    miner_id=(target or {}).get("id", ""),
-                    ok=False,
-                    error=str(exc),
-                )
-            )
+            facts.append(_failed(claim, params, target, str(exc)))
             break
         except TelegraphError as exc:
-            facts.append(
-                Fact(
-                    claim_id=claim.id,
-                    intent=claim.intent,
-                    params=params,
-                    miner=(target or {}).get("slug", "routed"),
-                    miner_id=(target or {}).get("id", ""),
-                    ok=False,
-                    error=str(exc),
-                )
-            )
+            facts.append(_failed(claim, params, target, str(exc)))
             continue
 
         payload = result.result if isinstance(result.result, dict) else {}
+        answered += 1
         facts.append(
             Fact(
                 claim_id=claim.id,
