@@ -1,0 +1,661 @@
+{
+ "company": "A.P. Moller-Maersk A/S",
+ "question": "Is this counterparty safe for 60-day payment terms?",
+ "verdict": {
+  "verdict": "HOLD",
+  "confidence": 0,
+  "reasons": [
+   "sanctions could not be checked: no usable answer was bought",
+   "registry reports the entity as active",
+   "sanctions: every ask failed",
+   "filings: every ask failed"
+  ]
+ },
+ "clusters": {
+  "registry": {
+   "claim_id": "registry",
+   "state": "single",
+   "scouts": 3,
+   "solid": 1,
+   "empty": 0,
+   "failed": 2,
+   "cost_usd": 0.01,
+   "agreement": {
+    "legal_name": 1.0,
+    "registration_id": 1.0,
+    "active": 1.0
+   },
+   "facts": [
+    {
+     "claim_id": "registry",
+     "intent": "CORPORATE_REGISTRY_LOOKUP_GENERAL",
+     "params": {
+      "company": "A.P. Moller-Maersk A/S",
+      "jurisdiction": "Denmark"
+     },
+     "miner": "PREFLIGHT Infrastructure Signals",
+     "miner_id": "20260828",
+     "fields": {
+      "legal_name": "A.P. M\u00d8LLER - M\u00c6RSK A/S",
+      "registration_id": "22756214",
+      "active": true
+     },
+     "price_usd": 0.01,
+     "receipt": {
+      "receipt_hash": "0x9ccaeadd5843bfaf5908eb0d3b4f4a0743cc7b545d8b5dc31e95476151e84aa6",
+      "rail": "escrow",
+      "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+      "miner": "5311",
+      "intent": "CORPORATE_REGISTRY_LOOKUP_GENERAL",
+      "amount_uusdc": "10000",
+      "epoch_id": 32,
+      "settlement": "epoch",
+      "chain": "telegraph",
+      "timestamp": 1795282051
+     },
+     "signal_hash": "0x36502787c04c249e21256280bc15df2569ad034bd807abf361ebae52ad37a817",
+     "ok": true,
+     "empty": false,
+     "error": null
+    },
+    {
+     "claim_id": "registry",
+     "intent": "CORPORATE_REGISTRY_LOOKUP_GENERAL",
+     "params": {
+      "company": "A.P. Moller-Maersk A/S",
+      "jurisdiction": "Denmark"
+     },
+     "miner": "miner-6110114",
+     "miner_id": "6110114",
+     "fields": {},
+     "price_usd": 0.0,
+     "receipt": null,
+     "signal_hash": null,
+     "ok": false,
+     "empty": false,
+     "error": "HTTP 500 after payment: miner error 404 [company_not_found]: no entity named exactly \"A.P. Moller-Maersk A/S\" is registered in DK. Similar registered names: A.P. M\u00d8LLER - M\u00c6RSK A/S. Retry with the exact legal name or the company number."
+    },
+    {
+     "claim_id": "registry",
+     "intent": "CORPORATE_REGISTRY_LOOKUP_GENERAL",
+     "params": {
+      "company": "A.P. Moller-Maersk A/S",
+      "jurisdiction": "Denmark"
+     },
+     "miner": "miner-98001",
+     "miner_id": "98001",
+     "fields": {},
+     "price_usd": 0.0,
+     "receipt": null,
+     "signal_hash": null,
+     "ok": false,
+     "empty": false,
+     "error": "HTTP 503 from /engine/v1/ask/98001: {\"error\":\"no_compatible_miner\",\"intent\":\"CORPORATE_REGISTRY_LOOKUP_GENERAL\",\"message\":\"no request built for a miner serving CORPORATE_REGISTRY_LOOKUP_GENERAL carries the resolved input\"}"
+    }
+   ]
+  },
+  "sanctions": {
+   "claim_id": "sanctions",
+   "state": "dead",
+   "scouts": 3,
+   "solid": 0,
+   "empty": 2,
+   "failed": 1,
+   "cost_usd": 0.02,
+   "agreement": {},
+   "facts": [
+    {
+     "claim_id": "sanctions",
+     "intent": "SANCTIONS_SCREENING_MATCH_GENERAL",
+     "params": {
+      "name": "A.P. Moller-Maersk A/S"
+     },
+     "miner": "kimutai-sanctions-screener",
+     "miner_id": "84392",
+     "fields": {},
+     "price_usd": 0.0,
+     "receipt": null,
+     "signal_hash": null,
+     "ok": false,
+     "empty": false,
+     "error": "HTTP 500 after payment: upstream error 400: {\"detail\":\"Missing 'prompt' field in request body.\"}"
+    },
+    {
+     "claim_id": "sanctions",
+     "intent": "SANCTIONS_SCREENING_MATCH_GENERAL",
+     "params": {
+      "name": "A.P. Moller-Maersk A/S"
+     },
+     "miner": "Sanctions Name Evidence",
+     "miner_id": "710637",
+     "fields": {
+      "matched": false,
+      "match_score": 0
+     },
+     "price_usd": 0.01,
+     "receipt": {
+      "receipt_hash": "0x55d7cdb94c52edf8d3100c067dec6ce20aafa826b428e056dc1d7edf428c9a2e",
+      "rail": "escrow",
+      "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+      "miner": "4860",
+      "intent": "SANCTIONS_SCREENING_MATCH_GENERAL",
+      "amount_uusdc": "10000",
+      "epoch_id": 32,
+      "settlement": "epoch",
+      "chain": "telegraph",
+      "timestamp": 1795282073
+     },
+     "signal_hash": "0x5c2d7aaffde80e921797255c5744751139acb88e36ddc97a63d5dff1a7ecdedd",
+     "ok": true,
+     "empty": true,
+     "error": null
+    },
+    {
+     "claim_id": "sanctions",
+     "intent": "SANCTIONS_SCREENING_MATCH_GENERAL",
+     "params": {
+      "name": "A.P. Moller-Maersk A/S"
+     },
+     "miner": "OFAC SDN Entity Screen",
+     "miner_id": "78021",
+     "fields": {
+      "matched": false,
+      "match_score": null
+     },
+     "price_usd": 0.01,
+     "receipt": {
+      "receipt_hash": "0x26dd01c7001db4861d8afaaf612ebf4ad2d353fdf9b271ced1e6d1adad4ddb76",
+      "rail": "escrow",
+      "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+      "miner": "5433",
+      "intent": "SANCTIONS_SCREENING_MATCH_GENERAL",
+      "amount_uusdc": "10000",
+      "epoch_id": 32,
+      "settlement": "epoch",
+      "chain": "telegraph",
+      "timestamp": 1795282077
+     },
+     "signal_hash": "0x393aba4debc630835719b2d939f63d4ac2a10cb1e88d756e9d696e33feedb7d0",
+     "ok": true,
+     "empty": true,
+     "error": null
+    }
+   ]
+  },
+  "filings": {
+   "claim_id": "filings",
+   "state": "dead",
+   "scouts": 1,
+   "solid": 0,
+   "empty": 1,
+   "failed": 0,
+   "cost_usd": 0.01,
+   "agreement": {},
+   "facts": [
+    {
+     "claim_id": "filings",
+     "intent": "REGULATORY_FILING_MONITOR_GENERAL",
+     "params": {
+      "entity": "A.P. Moller-Maersk A/S",
+      "period": "last 12 months"
+     },
+     "miner": "PREFLIGHT Infrastructure Signals",
+     "miner_id": "20260828",
+     "fields": {
+      "filing_count": 0
+     },
+     "price_usd": 0.01,
+     "receipt": {
+      "receipt_hash": "0x33bf27519d6321641c92d281303e00bc67b9bd6fde1652ab756b3e92b1f15573",
+      "rail": "escrow",
+      "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+      "miner": "5311",
+      "intent": "REGULATORY_FILING_MONITOR_GENERAL",
+      "amount_uusdc": "10000",
+      "epoch_id": 32,
+      "settlement": "epoch",
+      "chain": "telegraph",
+      "timestamp": 1795282053
+     },
+     "signal_hash": "0xea196660117ed2aafbc4147722d5026ccd172ba8f6686a74d9f9c230595db3e8",
+     "ok": true,
+     "empty": true,
+     "error": null
+    }
+   ]
+  },
+  "fx": {
+   "claim_id": "fx",
+   "state": "single",
+   "scouts": 1,
+   "solid": 1,
+   "empty": 0,
+   "failed": 0,
+   "cost_usd": 0.01,
+   "agreement": {
+    "converted_amount": 1.0
+   },
+   "facts": [
+    {
+     "claim_id": "fx",
+     "intent": "CURRENCY_EXCHANGE_CONVERT",
+     "params": {
+      "from_currency": "USD",
+      "to_currency": "DKK",
+      "amount": 1000.0
+     },
+     "miner": "FinWire Currency Exchange",
+     "miner_id": "7321",
+     "fields": {
+      "converted_amount": 6801.273885350319
+     },
+     "price_usd": 0.01,
+     "receipt": {
+      "receipt_hash": "0x3a8166b77981b7c9cd7e1caa8b6f34a932835d867713866642580dee37e218fd",
+      "rail": "escrow",
+      "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+      "miner": "5407",
+      "intent": "CURRENCY_EXCHANGE_CONVERT",
+      "amount_uusdc": "10000",
+      "epoch_id": 32,
+      "settlement": "epoch",
+      "chain": "telegraph",
+      "timestamp": 1795282054
+     },
+     "signal_hash": "0x2ab277c549135de6fac64feb7db980bd5e20112e8e8d4be0624e0adfed131d7a",
+     "ok": true,
+     "empty": false,
+     "error": null
+    }
+   ]
+  },
+  "identity": {
+   "claim_id": "identity",
+   "state": "single",
+   "scouts": 1,
+   "solid": 1,
+   "empty": 0,
+   "failed": 0,
+   "cost_usd": 0.01,
+   "agreement": {
+    "company": 1.0,
+    "employee_count": null,
+    "industry": null,
+    "headquarters": null
+   },
+   "facts": [
+    {
+     "claim_id": "identity",
+     "intent": "B2B_IDENTITY_ENRICHMENT_GENERAL",
+     "params": {
+      "company": "maersk.com"
+     },
+     "miner": "Brandfetch Search",
+     "miner_id": "95003",
+     "fields": {
+      "company": "maersk.com",
+      "employee_count": null,
+      "industry": null,
+      "headquarters": null
+     },
+     "price_usd": 0.01,
+     "receipt": {
+      "receipt_hash": "0xc7d5eac08a39948fd68040da3f84f6b490084e4a1eaca898ae08843b46070ba1",
+      "rail": "escrow",
+      "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+      "miner": "3022",
+      "intent": "B2B_IDENTITY_ENRICHMENT_GENERAL",
+      "amount_uusdc": "10000",
+      "epoch_id": 32,
+      "settlement": "epoch",
+      "chain": "telegraph",
+      "timestamp": 1795282055
+     },
+     "signal_hash": "0xfae6fa2432f6a77129565968e59c08de3e9304adcf50059508c1cc217585979f",
+     "ok": true,
+     "empty": false,
+     "error": null
+    }
+   ]
+  },
+  "macro": {
+   "claim_id": "macro",
+   "state": "single",
+   "scouts": 1,
+   "solid": 1,
+   "empty": 0,
+   "failed": 0,
+   "cost_usd": 0.01,
+   "agreement": {
+    "rate_pct": 1.0
+   },
+   "facts": [
+    {
+     "claim_id": "macro",
+     "intent": "MACRO_ECONOMIC_INDICATOR_GENERAL",
+     "params": {
+      "indicator": "unemployment rate",
+      "country": "Denmark",
+      "year": 2025
+     },
+     "miner": "DataWire Macro Economic Indicator",
+     "miner_id": "7390",
+     "fields": {
+      "rate_pct": 5.529
+     },
+     "price_usd": 0.01,
+     "receipt": {
+      "receipt_hash": "0xda1aa4dff8e83acb774ae70bb5572342d0b35fe9c8f1c9adaeecb4ec1167aa6e",
+      "rail": "escrow",
+      "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+      "miner": "4472",
+      "intent": "MACRO_ECONOMIC_INDICATOR_GENERAL",
+      "amount_uusdc": "10000",
+      "epoch_id": 32,
+      "settlement": "epoch",
+      "chain": "telegraph",
+      "timestamp": 1795282056
+     },
+     "signal_hash": "0x76cdfde1122a0cd4e12720fcb99f09d8c3d7bf0529ad33e30495b87b235be054",
+     "ok": true,
+     "empty": false,
+     "error": null
+    }
+   ]
+  },
+  "news": {
+   "claim_id": "news",
+   "state": "single",
+   "scouts": 1,
+   "solid": 1,
+   "empty": 0,
+   "failed": 0,
+   "cost_usd": 0.01,
+   "agreement": {
+    "result_count": 1.0,
+    "sources": 1.0
+   },
+   "facts": [
+    {
+     "claim_id": "news",
+     "intent": "NEWS_SEARCH_GENERAL",
+     "params": {
+      "query": "$company sanctions investigation"
+     },
+     "miner": "ChainSight \u2014 Universal Intelligence & Data Oracle",
+     "miner_id": "302",
+     "fields": {
+      "result_count": 4,
+      "sources": [
+       "newskarnataka.com",
+       "pollar.news",
+       "wrp.org.uk",
+       "thehindu.com"
+      ]
+     },
+     "price_usd": 0.01,
+     "receipt": {
+      "receipt_hash": "0x5cc878137cbe0367f66121936fdbdb5300be9a45fd480a2b148fce88f2f8cfbc",
+      "rail": "escrow",
+      "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+      "miner": "6119",
+      "intent": "NEWS_SEARCH_GENERAL",
+      "amount_uusdc": "10000",
+      "epoch_id": 32,
+      "settlement": "epoch",
+      "chain": "telegraph",
+      "timestamp": 1795282060
+     },
+     "signal_hash": "0x3376d41bc80303fa6d56f2c7bacf552bf3ecd6a113cc97fb9f58db002c02aec5",
+     "ok": true,
+     "empty": false,
+     "error": null
+    }
+   ]
+  }
+ },
+ "ledger": {
+  "purchases": 11,
+  "spent_usd": 0.08,
+  "by_intent": {
+   "CORPORATE_REGISTRY_LOOKUP_GENERAL": 0.01,
+   "SANCTIONS_SCREENING_MATCH_GENERAL": 0.02,
+   "REGULATORY_FILING_MONITOR_GENERAL": 0.01,
+   "CURRENCY_EXCHANGE_CONVERT": 0.01,
+   "B2B_IDENTITY_ENRICHMENT_GENERAL": 0.01,
+   "MACRO_ECONOMIC_INDICATOR_GENERAL": 0.01,
+   "NEWS_SEARCH_GENERAL": 0.01
+  },
+  "entries": [
+   {
+    "at": "2026-11-21T17:27:31.369827+00:00",
+    "claim": "registry",
+    "intent": "CORPORATE_REGISTRY_LOOKUP_GENERAL",
+    "miner": "PREFLIGHT Infrastructure Signals",
+    "miner_id": "20260828",
+    "price_usd": 0.01,
+    "ok": true,
+    "signal_hash": "0x36502787c04c249e21256280bc15df2569ad034bd807abf361ebae52ad37a817",
+    "receipt": {
+     "receipt_hash": "0x9ccaeadd5843bfaf5908eb0d3b4f4a0743cc7b545d8b5dc31e95476151e84aa6",
+     "rail": "escrow",
+     "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+     "miner": "5311",
+     "intent": "CORPORATE_REGISTRY_LOOKUP_GENERAL",
+     "amount_uusdc": "10000",
+     "epoch_id": 32,
+     "settlement": "epoch",
+     "chain": "telegraph",
+     "timestamp": 1795282051
+    }
+   },
+   {
+    "at": "2026-11-21T17:27:31.804290+00:00",
+    "claim": "sanctions",
+    "intent": "SANCTIONS_SCREENING_MATCH_GENERAL",
+    "miner": "kimutai-sanctions-screener",
+    "miner_id": "84392",
+    "price_usd": 0.0,
+    "ok": false,
+    "signal_hash": null,
+    "receipt": null
+   },
+   {
+    "at": "2026-11-21T17:27:33.497210+00:00",
+    "claim": "filings",
+    "intent": "REGULATORY_FILING_MONITOR_GENERAL",
+    "miner": "PREFLIGHT Infrastructure Signals",
+    "miner_id": "20260828",
+    "price_usd": 0.01,
+    "ok": true,
+    "signal_hash": "0xea196660117ed2aafbc4147722d5026ccd172ba8f6686a74d9f9c230595db3e8",
+    "receipt": {
+     "receipt_hash": "0x33bf27519d6321641c92d281303e00bc67b9bd6fde1652ab756b3e92b1f15573",
+     "rail": "escrow",
+     "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+     "miner": "5311",
+     "intent": "REGULATORY_FILING_MONITOR_GENERAL",
+     "amount_uusdc": "10000",
+     "epoch_id": 32,
+     "settlement": "epoch",
+     "chain": "telegraph",
+     "timestamp": 1795282053
+    }
+   },
+   {
+    "at": "2026-11-21T17:27:34.996766+00:00",
+    "claim": "fx",
+    "intent": "CURRENCY_EXCHANGE_CONVERT",
+    "miner": "FinWire Currency Exchange",
+    "miner_id": "7321",
+    "price_usd": 0.01,
+    "ok": true,
+    "signal_hash": "0x2ab277c549135de6fac64feb7db980bd5e20112e8e8d4be0624e0adfed131d7a",
+    "receipt": {
+     "receipt_hash": "0x3a8166b77981b7c9cd7e1caa8b6f34a932835d867713866642580dee37e218fd",
+     "rail": "escrow",
+     "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+     "miner": "5407",
+     "intent": "CURRENCY_EXCHANGE_CONVERT",
+     "amount_uusdc": "10000",
+     "epoch_id": 32,
+     "settlement": "epoch",
+     "chain": "telegraph",
+     "timestamp": 1795282054
+    }
+   },
+   {
+    "at": "2026-11-21T17:27:35.245293+00:00",
+    "claim": "identity",
+    "intent": "B2B_IDENTITY_ENRICHMENT_GENERAL",
+    "miner": "Brandfetch Search",
+    "miner_id": "95003",
+    "price_usd": 0.01,
+    "ok": true,
+    "signal_hash": "0xfae6fa2432f6a77129565968e59c08de3e9304adcf50059508c1cc217585979f",
+    "receipt": {
+     "receipt_hash": "0xc7d5eac08a39948fd68040da3f84f6b490084e4a1eaca898ae08843b46070ba1",
+     "rail": "escrow",
+     "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+     "miner": "3022",
+     "intent": "B2B_IDENTITY_ENRICHMENT_GENERAL",
+     "amount_uusdc": "10000",
+     "epoch_id": 32,
+     "settlement": "epoch",
+     "chain": "telegraph",
+     "timestamp": 1795282055
+    }
+   },
+   {
+    "at": "2026-11-21T17:27:36.350382+00:00",
+    "claim": "macro",
+    "intent": "MACRO_ECONOMIC_INDICATOR_GENERAL",
+    "miner": "DataWire Macro Economic Indicator",
+    "miner_id": "7390",
+    "price_usd": 0.01,
+    "ok": true,
+    "signal_hash": "0x76cdfde1122a0cd4e12720fcb99f09d8c3d7bf0529ad33e30495b87b235be054",
+    "receipt": {
+     "receipt_hash": "0xda1aa4dff8e83acb774ae70bb5572342d0b35fe9c8f1c9adaeecb4ec1167aa6e",
+     "rail": "escrow",
+     "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+     "miner": "4472",
+     "intent": "MACRO_ECONOMIC_INDICATOR_GENERAL",
+     "amount_uusdc": "10000",
+     "epoch_id": 32,
+     "settlement": "epoch",
+     "chain": "telegraph",
+     "timestamp": 1795282056
+    }
+   },
+   {
+    "at": "2026-11-21T17:27:40.387615+00:00",
+    "claim": "news",
+    "intent": "NEWS_SEARCH_GENERAL",
+    "miner": "ChainSight \u2014 Universal Intelligence & Data Oracle",
+    "miner_id": "302",
+    "price_usd": 0.01,
+    "ok": true,
+    "signal_hash": "0x3376d41bc80303fa6d56f2c7bacf552bf3ecd6a113cc97fb9f58db002c02aec5",
+    "receipt": {
+     "receipt_hash": "0x5cc878137cbe0367f66121936fdbdb5300be9a45fd480a2b148fce88f2f8cfbc",
+     "rail": "escrow",
+     "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+     "miner": "6119",
+     "intent": "NEWS_SEARCH_GENERAL",
+     "amount_uusdc": "10000",
+     "epoch_id": 32,
+     "settlement": "epoch",
+     "chain": "telegraph",
+     "timestamp": 1795282060
+    }
+   },
+   {
+    "at": "2026-11-21T17:27:43.697078+00:00",
+    "claim": "registry",
+    "intent": "CORPORATE_REGISTRY_LOOKUP_GENERAL",
+    "miner": "miner-6110114",
+    "miner_id": "6110114",
+    "price_usd": 0.0,
+    "ok": false,
+    "signal_hash": null,
+    "receipt": null
+   },
+   {
+    "at": "2026-11-21T17:27:43.697289+00:00",
+    "claim": "registry",
+    "intent": "CORPORATE_REGISTRY_LOOKUP_GENERAL",
+    "miner": "miner-98001",
+    "miner_id": "98001",
+    "price_usd": 0.0,
+    "ok": false,
+    "signal_hash": null,
+    "receipt": null
+   },
+   {
+    "at": "2026-11-21T17:27:57.131085+00:00",
+    "claim": "sanctions",
+    "intent": "SANCTIONS_SCREENING_MATCH_GENERAL",
+    "miner": "Sanctions Name Evidence",
+    "miner_id": "710637",
+    "price_usd": 0.01,
+    "ok": true,
+    "signal_hash": "0x5c2d7aaffde80e921797255c5744751139acb88e36ddc97a63d5dff1a7ecdedd",
+    "receipt": {
+     "receipt_hash": "0x55d7cdb94c52edf8d3100c067dec6ce20aafa826b428e056dc1d7edf428c9a2e",
+     "rail": "escrow",
+     "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+     "miner": "4860",
+     "intent": "SANCTIONS_SCREENING_MATCH_GENERAL",
+     "amount_uusdc": "10000",
+     "epoch_id": 32,
+     "settlement": "epoch",
+     "chain": "telegraph",
+     "timestamp": 1795282073
+    }
+   },
+   {
+    "at": "2026-11-21T17:27:57.131322+00:00",
+    "claim": "sanctions",
+    "intent": "SANCTIONS_SCREENING_MATCH_GENERAL",
+    "miner": "OFAC SDN Entity Screen",
+    "miner_id": "78021",
+    "price_usd": 0.01,
+    "ok": true,
+    "signal_hash": "0x393aba4debc630835719b2d939f63d4ac2a10cb1e88d756e9d696e33feedb7d0",
+    "receipt": {
+     "receipt_hash": "0x26dd01c7001db4861d8afaaf612ebf4ad2d353fdf9b271ced1e6d1adad4ddb76",
+     "rail": "escrow",
+     "payer": "0xb2b73753bc5396f5ebb34b0ea099abccfc6f2147",
+     "miner": "5433",
+     "intent": "SANCTIONS_SCREENING_MATCH_GENERAL",
+     "amount_uusdc": "10000",
+     "epoch_id": 32,
+     "settlement": "epoch",
+     "chain": "telegraph",
+     "timestamp": 1795282077
+    }
+   }
+  ]
+ },
+ "budget": {
+  "total_usd": 0.25,
+  "spent_usd": 0.08,
+  "remaining_usd": 0.17,
+  "purchases": 8
+ },
+ "escalations": [
+  {
+   "claim": "registry",
+   "miners": 2,
+   "reason": "escalation:single"
+  },
+  {
+   "claim": "sanctions",
+   "miners": 2,
+   "reason": "escalation:dead"
+  }
+ ],
+ "bundle_sha256": "cee82b5a8e9e4e4b10039423b444decf26f06852fe328b969a338b53739e6bcb",
+ "memo": "# A.P. Moller-Maersk A/S\n\n**Verdict: HOLD**  \u00b7  confidence 0/100  \u00b7  spent $0.0800 on 8 purchases\n\n- sanctions could not be checked: no usable answer was bought\n- registry reports the entity as active\n- sanctions: every ask failed\n- filings: every ask failed\n\n## What the swarm bought\n\n- **registry** (single) \u2014 legal_name: A.P. M\u00d8LLER - M\u00c6RSK A/S; registration_id: 22756214; active: True [1],[8],[9]\n- **sanctions** (dead) \u2014 nothing usable came back [2],[10],[11]\n- **filings** (dead) \u2014 nothing usable came back [3]\n- **fx** (single) \u2014 converted_amount: 6,801.2739 [4]\n- **identity** (single) \u2014 company: maersk.com [5]\n- **macro** (single) \u2014 rate_pct: 5.529 [6]\n- **news** (single) \u2014 result_count: 4; sources: newskarnataka.com, pollar.news, wrp.org.uk\u2026 [7]\n\n## What we could not verify\n- sanctions: no usable answer was returned, so nothing is asserted about it.\n- filings: no usable answer was returned, so nothing is asserted about it.\n\n## Receipts\n\n| # | claim | miner | price | signal |\n|---|-------|-------|-------|--------|\n| 1 | registry | PREFLIGHT Infrastructure Signals | $0.0100 | `0x36502787c0` |\n| 2 | sanctions | kimutai-sanctions-screener | $0.0000 | `\u2014` |\n| 3 | filings | PREFLIGHT Infrastructure Signals | $0.0100 | `0xea19666011` |\n| 4 | fx | FinWire Currency Exchange | $0.0100 | `0x2ab277c549` |\n| 5 | identity | Brandfetch Search | $0.0100 | `0xfae6fa2432` |\n| 6 | macro | DataWire Macro Economic Indicator | $0.0100 | `0x76cdfde112` |\n| 7 | news | ChainSight \u2014 Universal Intelligence & Data Oracle | $0.0100 | `0x3376d41bc8` |\n| 8 | registry | miner-6110114 | $0.0000 | `\u2014` |\n| 9 | registry | miner-98001 | $0.0000 | `\u2014` |\n| 10 | sanctions | Sanctions Name Evidence | $0.0100 | `0x5c2d7aaffd` |\n| 11 | sanctions | OFAC SDN Entity Screen | $0.0100 | `0x393aba4deb` |\n\n## Cost\n\n- asks made: 11 (answered: 8)\n- purchases billed: 8\n- spent: $0.0800 of $0.25 budget\n- escalated: registry, sanctions\n"
+}
