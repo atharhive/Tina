@@ -1,13 +1,13 @@
-.PHONY: help install test quote verify spend
+.PHONY: help install test verify demo
 
 PY := ./.venv/bin/python
 
 help:
 	@echo "make install   create the venv and install requirements"
 	@echo "make test      run the offline suite"
-	@echo "make quote     price the yield workflow, pay nothing"
-	@echo "make verify    re-check every signal in the committed evidence"
-	@echo "make spend     show what the caps have been charged"
+	@echo "make claims    the seven claims and the intents behind them"
+	@echo "make verify    verify the committed bundle without trusting it"
+	@echo "make demo      run the api and open the demo page"
 
 install:
 	python3 -m venv .venv
@@ -16,13 +16,11 @@ install:
 test:
 	$(PY) -m pytest tests -q
 
-quote:
-	$(PY) cli.py quote yield --project aave-v3
+claims:
+	$(PY) -m colony.cli claims
 
 verify:
-	$(PY) scripts/verify_evidence.py evidence/listing-20261119T071626Z.json
-	$(PY) scripts/verify_evidence.py evidence/stablecoin-20261119T071634Z.json
-	$(PY) scripts/verify_evidence.py evidence/yield-20261119T071831Z.json
+	$(PY) scripts/verify_bundle.py evidence/colony-maersk-20261121.json
 
-spend:
-	$(PY) cli.py spend
+demo:
+	$(PY) -m colony.api --port 8088

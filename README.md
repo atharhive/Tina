@@ -84,7 +84,7 @@ Free, no wallet, no spend:
 ```bash
 ./.venv/bin/python -m colony.cli claims      # the seven claims and the intents behind them
 ./.venv/bin/python -m colony.cli ledger      # what has been bought, with receipts
-./.venv/bin/python -m pytest tests -q        # 87 tests, offline
+./.venv/bin/python -m pytest tests -q        # 46 tests, offline
 ```
 
 HTTP, if you want to call it from a treasury system:
