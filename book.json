@@ -1,0 +1,6 @@
+{
+  "companies": [
+    {"name": "A.P. Moller-Maersk A/S", "domain": "maersk.com", "jurisdiction": "Denmark"},
+    {"name": "Novo Nordisk A/S", "domain": "novonordisk.com", "jurisdiction": "Denmark"}
+  ]
+}
